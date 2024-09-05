@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -12,7 +13,9 @@ import java.util.Objects;
  */
 public class ChessBoard {
 
-    private final Map<ChessPosition, ChessPiece> pieces = new HashMap<>();
+    private final int BOARD_ROWS = 8;
+    private final int BOARD_COLS = 8;
+    private final ChessPiece[][] board = new ChessPiece[BOARD_ROWS][BOARD_COLS];
 
     public ChessBoard() {
         
@@ -24,9 +27,19 @@ public class ChessBoard {
         if (o == null || getClass() != o.getClass()) return false;
         ChessBoard that = (ChessBoard) o;
 
-        for (ChessPosition position : pieces.keySet()) {
-            if (!pieces.get(position).equals(that.pieces.get(position))) {
-                return false;
+        for (int i = 0; i < BOARD_ROWS; i++) {
+            for (int j = 0; j < BOARD_COLS; j++) {
+                if (board[i][j] == null) {
+                    if (that.board[i][j] != null) {
+                        return false;
+                    }
+                }
+                if (that.board[i][j] == null) {
+                    return false;
+                }
+                if (!board[i][j].equals(that.board[i][j])) {
+                    return false;
+                }
             }
         }
         return true;
@@ -34,8 +47,9 @@ public class ChessBoard {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(pieces);
+        return Objects.hashCode(board);
     }
+
 
     /**
      * Adds a chess piece to the chessboard
@@ -44,8 +58,8 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        if (!pieces.containsKey(position)) {
-            pieces.put(position, piece);
+        if (board[position.getRow()][position.getColumn()] == null) {
+            board[position.getRow()][position.getColumn()] = piece;
         }
     }
 
@@ -57,7 +71,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return pieces.getOrDefault(position, null);
+        return board[position.getRow()][position.getColumn()];
     }
 
     /**
