@@ -18,6 +18,25 @@ public class ChessPosition {
         this.col = col;
     }
 
+    /**
+     * Returns a new position considered moving "forward" by a number of spaces, based on the piece's color.
+     * @param color The color of the moving piece.
+     * @param spaces The number of spaces to move.
+     * @return The position reached by moving forward the given number of spaces.
+     */
+    public ChessPosition forward(ChessGame.TeamColor color, int spaces) {
+        return new ChessPosition(color.equals(ChessGame.TeamColor.BLACK) ? row - spaces : row + spaces, col);
+    }
+
+    /**
+     * Returns a new position considered moving "forward" by one space, based on the piece's color.
+     * @param color The color of the moving piece.
+     * @return The position reached by moving forward one space.
+     */
+    public ChessPosition forward(ChessGame.TeamColor color) {
+        return forward(color, 1);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
