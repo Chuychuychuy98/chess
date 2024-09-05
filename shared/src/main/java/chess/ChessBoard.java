@@ -89,10 +89,41 @@ public class ChessBoard {
     }
 
     /**
+     * Places a row of non-pawn pieces on a given row for a given color. Assumes normal chess setup.
+     * @param row The row to place the pieces on.
+     * @param color The color of the pieces.
+     */
+    private void placeSpecialPieces(int row, ChessGame.TeamColor color) {
+        board[row][0] = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+        board[row][1] = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+        board[row][2] = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+        board[row][3] = new ChessPiece(color, ChessPiece.PieceType.QUEEN);
+        board[row][4] = new ChessPiece(color, ChessPiece.PieceType.KING);
+        board[row][5] = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+        board[row][6] = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+        board[row][7] = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+    }
+
+    /**
+     * Places pawns of a specified color on the specified row.
+     * @param row The row to place the pawns on.
+     * @param color The color of the pawns.
+     */
+    private void placePawns(int row, ChessGame.TeamColor color) {
+        for (int i = 0; i < BOARD_COLS; i++) {
+            board[row][i] = new ChessPiece(color, ChessPiece.PieceType.PAWN);
+        }
+    }
+
+    /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        placeSpecialPieces(0, ChessGame.TeamColor.WHITE);
+        placeSpecialPieces(7, ChessGame.TeamColor.BLACK);
+
+        placePawns(1, ChessGame.TeamColor.WHITE);
+        placePawns(6, ChessGame.TeamColor.BLACK);
     }
 }
