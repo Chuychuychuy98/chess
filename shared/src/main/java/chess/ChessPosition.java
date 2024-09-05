@@ -37,6 +37,16 @@ public class ChessPosition {
         return forward(color, 1);
     }
 
+    /**
+     * Returns a new position representing a translation of the current position.
+     * @param rowChange The amount to change the row by.
+     * @param colChange The amount to change the column by.
+     * @return The new position.
+     */
+    public ChessPosition translate(int rowChange, int colChange) {
+        return new ChessPosition(row + rowChange, col + colChange);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
