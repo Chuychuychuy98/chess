@@ -34,10 +34,10 @@ public class ChessBoard {
                         return false;
                     }
                 }
-                if (that.board[i][j] == null) {
+                else if (that.board[i][j] == null) {
                     return false;
                 }
-                if (!board[i][j].equals(that.board[i][j])) {
+                else if (!board[i][j].equals(that.board[i][j])) {
                     return false;
                 }
             }
