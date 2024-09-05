@@ -47,6 +47,26 @@ public class ChessPosition {
         return new ChessPosition(row + rowChange, col + colChange);
     }
 
+    /**
+     * Returns whether the position is within the given bounds (inclusive).
+     * @param rowMin Minimum allowed row value.
+     * @param rowMax Maximum allowed row value.
+     * @param colMin Minimum allowed column value.
+     * @param colMax Maximum allowed colum value.
+     * @return Whether the position is within the given bounds (inclusive).
+     */
+    public boolean inBounds(int rowMin, int rowMax, int colMin, int colMax) {
+        return row >= rowMin && row <= rowMax && col >= colMin && col <= colMax;
+    }
+
+    /**
+     * Returns whether the position is within normal chess bounds (1 - 8)
+     * @return Whether this position's row and column are between 1 - 8 inclusive.
+     */
+    public boolean inBounds() {
+        return inBounds(1, 8, 1, 8);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
