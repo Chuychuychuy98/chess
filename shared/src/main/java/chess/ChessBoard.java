@@ -51,6 +51,20 @@ public class ChessBoard {
     }
 
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 8; i++) {
+            sb.append("|");
+            for (int j = 0; j < 8; j++) {
+                sb.append(board[i][j] != null ? board[i][j].toString() : " ");
+                sb.append("|");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
