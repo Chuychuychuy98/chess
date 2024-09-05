@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class ChessBoard {
 
-    private Map<ChessPosition, ChessPiece> pieces = new HashMap<>();
+    private final Map<ChessPosition, ChessPiece> pieces = new HashMap<>();
 
     public ChessBoard() {
         
