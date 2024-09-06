@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -13,6 +14,7 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
     private final ChessPiece.PieceType type;
+    private boolean movedBefore = false;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
@@ -71,6 +73,63 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        return switch (type) {
+            case KING, QUEEN, BISHOP, KNIGHT, ROOK -> null;
+            case PAWN -> pawnMoves(board, myPosition);
+        };
+    }
+
+
+
+    /**
+     * Add pawn moves to a collection of moves, including all possible promotions.
+     * @param oldPos The position being moved from.
+     * @param newPos The position being moved to.
+     * @param moves The collection to add the moves to.
+     */
+    private void addPawnMoveWithPromotions(ChessPosition oldPos, ChessPosition newPos, Collection<ChessMove> moves) {
+        if ((newPos.getRow() == 0 && pieceColor == ChessGame.TeamColor.BLACK) || (newPos.getRow() == 7 && pieceColor == ChessGame.TeamColor.WHITE)) {
+            moves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.QUEEN));
+            moves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.BISHOP));
+            moves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.KNIGHT));
+            moves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.ROOK));
+        }
+        else {
+            moves.add(new ChessMove(oldPos, newPos, null));
+        }
+    }
+
+    /**
+     * Returns a collection of a pawn's possible moves.
+     * @param board The board the piece is on.
+     * @param curPos The current position.
+     * @return A collection of all possible moves.
+     */
+    private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition curPos) {
+        Collection<ChessMove> moves = new HashSet<>();
+
+        ChessPosition newPos = curPos.forward(pieceColor);
+        if (!newPos.inBounds()) return moves;
+
+        if (board.getPiece(newPos) == null) {
+            addPawnMoveWithPromotions(curPos, newPos, moves);
+            if (!movedBefore) {
+                newPos = newPos.forward(pieceColor);
+                if (newPos.inBounds() && board.getPiece(newPos) == null) {
+                    addPawnMoveWithPromotions(curPos, newPos, moves);
+                }
+            }
+        }
+
+        newPos = curPos.translate(pieceColor, 1, 1);
+        if (board.positionBlockedByEnemy(newPos, pieceColor)) {
+            moves.add(new ChessMove(curPos, newPos, null));
+        }
+        newPos = curPos.translate(pieceColor, 1, -1);
+        if (board.positionBlockedByEnemy(newPos, pieceColor)) {
+            moves.add(new ChessMove(curPos, newPos, null));
+        }
+
+        return moves;
     }
 }
