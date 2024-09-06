@@ -126,4 +126,17 @@ public class ChessBoard {
         placePawns(1, ChessGame.TeamColor.WHITE);
         placePawns(6, ChessGame.TeamColor.BLACK);
     }
+
+    /**
+     * Returns whether a given position is occupied by an enemy piece.
+     * @param pos The position to check.
+     * @param color The friendly piece's color.
+     * @return Whether the given position is occupied by an enemy piece.
+     */
+    public boolean positionBlockedByEnemy(ChessPosition pos, ChessGame.TeamColor color) {
+        ChessPiece piece = getPiece(pos);
+        if (piece == null) return false;
+        return piece.getTeamColor() != color;
+    }
+
 }
