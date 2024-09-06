@@ -54,6 +54,16 @@ public class ChessPosition {
     }
 
     /**
+     * Returns a new position representing a translation of the current position.
+     * @param rowChange The amount to change the row by.
+     * @param colChange The amount to change the column by.
+     * @return The new position.
+     */
+    public ChessPosition translate(int rowChange, int colChange) {
+        return new ChessPosition(row + rowChange, col + colChange);
+    }
+
+    /**
      * Returns whether the position is within the given bounds (inclusive).
      * @param rowMin Minimum allowed row value.
      * @param rowMax Maximum allowed row value.
