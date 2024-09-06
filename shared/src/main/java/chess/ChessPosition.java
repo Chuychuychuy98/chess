@@ -38,13 +38,19 @@ public class ChessPosition {
     }
 
     /**
-     * Returns a new position representing a translation of the current position.
+     * Returns a new position representing a translation of the current position. Row change is added or subtracted based on color.
+     * @param color The color of the piece.
      * @param rowChange The amount to change the row by.
      * @param colChange The amount to change the column by.
      * @return The new position.
      */
-    public ChessPosition translate(int rowChange, int colChange) {
-        return new ChessPosition(row + rowChange, col + colChange);
+    public ChessPosition translate(ChessGame.TeamColor color, int rowChange, int colChange) {
+        if (color == ChessGame.TeamColor.BLACK) {
+            return new ChessPosition(row - rowChange, col + colChange);
+        }
+        else {
+            return new ChessPosition(row + rowChange, col + colChange);
+        }
     }
 
     /**
