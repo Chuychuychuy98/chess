@@ -83,10 +83,40 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         return switch (type) {
-            case KING, QUEEN, BISHOP, KNIGHT -> null;
+            case KING, QUEEN, BISHOP -> null;
+            case KNIGHT -> knightMoves(board, myPosition);
             case ROOK -> rookMoves(board, myPosition);
             case PAWN -> pawnMoves(board, myPosition);
         };
+    }
+
+
+
+    /**
+     * Returns a collection containing a knight's potential moves
+     * @param board The board being moved on
+     * @param myPosition The knight's original position
+     * @return A new collection containing a knight's potential moves
+     */
+    private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> moves = new HashSet<>();
+        ChessPosition newPosition = myPosition.translate(1, 2);
+        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = myPosition.translate(-1, 2);
+        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = myPosition.translate(1, -2);
+        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = myPosition.translate(-1, -2);
+        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = myPosition.translate(2, 1);
+        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = myPosition.translate(-2, 1);
+        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = myPosition.translate(2, -1);
+        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = myPosition.translate(-2, -1);
+        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        return moves;
     }
 
     /**
