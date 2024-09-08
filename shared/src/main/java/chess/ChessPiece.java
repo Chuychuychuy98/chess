@@ -144,8 +144,9 @@ public class ChessPiece {
     private void addRookMovesUpDown(ChessBoard board, ChessPosition myPosition, boolean up, Collection<ChessMove> moves) {
         int spaces = 1;
         ChessPosition newPosition = myPosition.translate(up ? spaces : -spaces, 0);
-        while (newPosition.inBounds() && board.getPiece(newPosition) == null) {
+        while (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) {
             moves.add(new ChessMove(myPosition, newPosition, null));
+            if (board.getPiece(newPosition) != null) break;
             spaces++;
             newPosition = myPosition.translate(up ? spaces : -spaces, 0);
         }
@@ -161,8 +162,9 @@ public class ChessPiece {
     private void addRookMovesLeftRight(ChessBoard board, ChessPosition myPosition, boolean left, Collection<ChessMove> moves) {
         int spaces = 1;
         ChessPosition newPosition = myPosition.translate(0, left ? -spaces : spaces);
-        while (newPosition.inBounds() && board.getPiece(newPosition) == null) {
+        while (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) {
             moves.add(new ChessMove(myPosition, newPosition, null));
+            if (board.getPiece(newPosition) != null) break;
             spaces++;
             newPosition = myPosition.translate(0, left ? -spaces : spaces);
         }
