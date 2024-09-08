@@ -101,21 +101,21 @@ public class ChessPiece {
     private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new HashSet<>();
         ChessPosition newPosition = myPosition.translate(1, 2);
-        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
         newPosition = myPosition.translate(-1, 2);
-        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
         newPosition = myPosition.translate(1, -2);
-        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
         newPosition = myPosition.translate(-1, -2);
-        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
         newPosition = myPosition.translate(2, 1);
-        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
         newPosition = myPosition.translate(-2, 1);
-        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
         newPosition = myPosition.translate(2, -1);
-        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
         newPosition = myPosition.translate(-2, -1);
-        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
         return moves;
     }
 
