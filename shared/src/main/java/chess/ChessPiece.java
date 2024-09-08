@@ -286,11 +286,11 @@ public class ChessPiece {
 
         newPos = curPos.translate(pieceColor, 1, 1);
         if (newPos.inBounds() && board.positionBlockedByEnemy(newPos, pieceColor)) {
-            moves.add(new ChessMove(curPos, newPos, null));
+            addPawnMoveWithPromotions(curPos, newPos, moves);
         }
         newPos = curPos.translate(pieceColor, 1, -1);
         if (newPos.inBounds() && board.positionBlockedByEnemy(newPos, pieceColor)) {
-            moves.add(new ChessMove(curPos, newPos, null));
+            addPawnMoveWithPromotions(curPos, newPos, moves);
         }
 
         return moves;
