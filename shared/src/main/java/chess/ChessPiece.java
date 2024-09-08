@@ -101,21 +101,21 @@ public class ChessPiece {
     private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new HashSet<>();
         ChessPosition newPosition = myPosition.translate(1, 2);
-        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
         newPosition = myPosition.translate(-1, 2);
-        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
         newPosition = myPosition.translate(1, -2);
-        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
         newPosition = myPosition.translate(-1, -2);
-        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
         newPosition = myPosition.translate(2, 1);
-        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
         newPosition = myPosition.translate(-2, 1);
-        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
         newPosition = myPosition.translate(2, -1);
-        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
         newPosition = myPosition.translate(-2, -1);
-        if (newPosition.inBounds() && board.getPiece(newPosition) != null) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (newPosition.inBounds() && board.getPiece(newPosition) == null) moves.add(new ChessMove(myPosition, newPosition, null));
         return moves;
     }
 
@@ -144,7 +144,7 @@ public class ChessPiece {
     private void addRookMovesUpDown(ChessBoard board, ChessPosition myPosition, boolean up, Collection<ChessMove> moves) {
         int spaces = 1;
         ChessPosition newPosition = myPosition.translate(up ? spaces : -spaces, 0);
-        while (newPosition.inBounds() && board.getPiece(newPosition) != null) {
+        while (newPosition.inBounds() && board.getPiece(newPosition) == null) {
             moves.add(new ChessMove(myPosition, newPosition, null));
             spaces++;
             newPosition = myPosition.translate(up ? spaces : -spaces, 0);
@@ -161,7 +161,7 @@ public class ChessPiece {
     private void addRookMovesLeftRight(ChessBoard board, ChessPosition myPosition, boolean left, Collection<ChessMove> moves) {
         int spaces = 1;
         ChessPosition newPosition = myPosition.translate(0, left ? -spaces : spaces);
-        while (newPosition.inBounds() && board.getPiece(newPosition) != null) {
+        while (newPosition.inBounds() && board.getPiece(newPosition) == null) {
             moves.add(new ChessMove(myPosition, newPosition, null));
             spaces++;
             newPosition = myPosition.translate(0, left ? -spaces : spaces);
