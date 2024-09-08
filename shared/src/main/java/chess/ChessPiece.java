@@ -74,12 +74,60 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         return switch (type) {
-            case KING, QUEEN, BISHOP, KNIGHT, ROOK -> null;
+            case KING, QUEEN, BISHOP, KNIGHT -> null;
+            case ROOK -> rookMoves(board, myPosition);
             case PAWN -> pawnMoves(board, myPosition);
         };
     }
 
+    /**
+     * Returns a collection of a rook's possible moves
+     * @param board The board being moved on
+     * @param myPosition The rook's starting position
+     * @return A new collection of the rook's potential moves
+     */
+    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> moves = new HashSet<>();
+        addRookMovesUpDown(board, myPosition, true, moves);
+        addRookMovesUpDown(board, myPosition, false, moves);
+        addRookMovesLeftRight(board, myPosition, true, moves);
+        addRookMovesLeftRight(board, myPosition, false, moves);
+        return moves;
+    }
 
+    /**
+     * Add vertical moves to a rook's potential move set
+     * @param board The board being moved on
+     * @param myPosition The rook's starting position
+     * @param up Whether the rook is moving up or down
+     * @param moves The move set being added to
+     */
+    private void addRookMovesUpDown(ChessBoard board, ChessPosition myPosition, boolean up, Collection<ChessMove> moves) {
+        int spaces = 1;
+        ChessPosition newPosition = myPosition.translate(up ? -spaces : spaces, 0);
+        while (newPosition.inBounds() && board.getPiece(newPosition) != null) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+            spaces++;
+            newPosition = myPosition.translate(up ? -spaces : spaces, 0);
+        }
+    }
+
+    /**
+     * Add horizontal moves to a rook's potential move set
+     * @param board The board being moved on
+     * @param myPosition The rook's starting position
+     * @param left Whether the rook is moving left or right
+     * @param moves The move set being added to
+     */
+    private void addRookMovesLeftRight(ChessBoard board, ChessPosition myPosition, boolean left, Collection<ChessMove> moves) {
+        int spaces = 1;
+        ChessPosition newPosition = myPosition.translate(0, left ? -spaces : spaces);
+        while (newPosition.inBounds() && board.getPiece(newPosition) != null) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+            spaces++;
+            newPosition = myPosition.translate(0, left ? -spaces : spaces);
+        }
+    }
 
     /**
      * Add pawn moves to a collection of moves, including all possible promotions.
