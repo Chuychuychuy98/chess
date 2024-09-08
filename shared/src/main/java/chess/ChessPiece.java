@@ -83,7 +83,14 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         return switch (type) {
-            case KING, QUEEN, BISHOP -> null;
+            case KING -> null;
+            case QUEEN -> {
+                Collection<ChessMove> moves = new HashSet<>();
+                moves.addAll(bishopMoves(board, myPosition));
+                moves.addAll(rookMoves(board, myPosition));
+                yield moves;
+            }
+            case BISHOP -> bishopMoves(board, myPosition);
             case KNIGHT -> knightMoves(board, myPosition);
             case ROOK -> rookMoves(board, myPosition);
             case PAWN -> pawnMoves(board, myPosition);
