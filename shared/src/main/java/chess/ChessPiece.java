@@ -251,7 +251,7 @@ public class ChessPiece {
      * @param moves The collection to add the moves to.
      */
     private void addPawnMoveWithPromotions(ChessPosition oldPos, ChessPosition newPos, Collection<ChessMove> moves) {
-        if ((newPos.getRow() == 0 && pieceColor == ChessGame.TeamColor.BLACK) || (newPos.getRow() == 7 && pieceColor == ChessGame.TeamColor.WHITE)) {
+        if ((newPos.getRow() == 1 && pieceColor == ChessGame.TeamColor.BLACK) || (newPos.getRow() == 8 && pieceColor == ChessGame.TeamColor.WHITE)) {
             moves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.QUEEN));
             moves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.BISHOP));
             moves.add(new ChessMove(oldPos, newPos, ChessPiece.PieceType.KNIGHT));
