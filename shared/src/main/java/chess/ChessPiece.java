@@ -143,11 +143,11 @@ public class ChessPiece {
      */
     private void addRookMovesUpDown(ChessBoard board, ChessPosition myPosition, boolean up, Collection<ChessMove> moves) {
         int spaces = 1;
-        ChessPosition newPosition = myPosition.translate(up ? -spaces : spaces, 0);
+        ChessPosition newPosition = myPosition.translate(up ? spaces : -spaces, 0);
         while (newPosition.inBounds() && board.getPiece(newPosition) != null) {
             moves.add(new ChessMove(myPosition, newPosition, null));
             spaces++;
-            newPosition = myPosition.translate(up ? -spaces : spaces, 0);
+            newPosition = myPosition.translate(up ? spaces : -spaces, 0);
         }
     }
 
