@@ -143,6 +143,6 @@ public class ChessBoard {
      * @return Whether the given position is empty or occupied by an enemy piece
      */
     public boolean canMoveOrCapture(ChessPosition pos, ChessGame.TeamColor color) {
-        return getPiece(pos) == null || positionBlockedByEnemy(pos, color);
+        return pos.inBounds() && (getPiece(pos) == null || positionBlockedByEnemy(pos, color));
     }
 }
