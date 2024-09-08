@@ -15,16 +15,6 @@ public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final ChessPiece.PieceType type;
 
-    public boolean isMovedBefore() {
-        return movedBefore;
-    }
-
-    public void setMovedBefore(boolean movedBefore) {
-        this.movedBefore = movedBefore;
-    }
-
-    private boolean movedBefore = false;
-
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
@@ -286,7 +276,7 @@ public class ChessPiece {
 
         if (board.getPiece(newPos) == null) {
             addPawnMoveWithPromotions(curPos, newPos, moves);
-            if (!movedBefore) {
+            if (pieceColor == ChessGame.TeamColor.WHITE ? curPos.getRow() == 2 : curPos.getRow() == 7) {
                 newPos = newPos.forward(pieceColor);
                 if (newPos.inBounds() && board.getPiece(newPos) == null) {
                     addPawnMoveWithPromotions(curPos, newPos, moves);
