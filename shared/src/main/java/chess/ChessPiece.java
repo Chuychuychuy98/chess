@@ -83,7 +83,7 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         return switch (type) {
-            case KING -> null;
+            case KING -> kingMoves(board, myPosition);
             case QUEEN -> {
                 Collection<ChessMove> moves = new HashSet<>();
                 moves.addAll(bishopMoves(board, myPosition));
@@ -97,7 +97,84 @@ public class ChessPiece {
         };
     }
 
+    /**
+     * Returns a collection containing a king's potential moves
+     * @param board The board being moved on
+     * @param myPosition The king's starting position
+     * @return A new collection containing the king's potential moves
+     */
+    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> moves = new HashSet<>();
+        ChessPosition newPosition = myPosition.translate(1, 0);
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = myPosition.translate(1, 1);
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = myPosition.translate(0, 1);
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = myPosition.translate(-1, 1);
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = myPosition.translate(-1, 0);
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = myPosition.translate(-1, -1);
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = myPosition.translate(0, -1);
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = myPosition.translate(1, -1);
+        if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        return moves;
+    }
 
+    /**
+     * Returns a collection containing a bishop's potential moves
+     * @param board The board being moved on
+     * @param myPosition The bishop's original position
+     * @return A new collection containing the bishop's potential moves
+     */
+    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
+        boolean continueNE = true;
+        boolean continueSE = true;
+        boolean continueNW = true;
+        boolean continueSW = true;
+
+        Collection<ChessMove> moves = new HashSet<>();
+
+        ChessPosition newPosition;
+        for (int spaces = 1; spaces < 8 && (continueNE || continueSE || continueNW || continueSW); spaces++) {
+            if (continueNE) {
+                newPosition = myPosition.translate(spaces, spaces);
+                if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) {
+                    moves.add(new ChessMove(myPosition, newPosition, null));
+                    if (board.getPiece(newPosition) != null) continueNE = false;
+                }
+                else continueNE = false;
+            }
+            if (continueSE) {
+                newPosition = myPosition.translate(-spaces, spaces);
+                if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) {
+                    moves.add(new ChessMove(myPosition, newPosition, null));
+                    if (board.getPiece(newPosition) != null) continueNE = false;
+                }
+                else continueSE = false;
+            }
+            if (continueNW) {
+                newPosition = myPosition.translate(spaces, -spaces);
+                if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) {
+                    moves.add(new ChessMove(myPosition, newPosition, null));
+                    if (board.getPiece(newPosition) != null) continueNE = false;
+                }
+                else continueNW = false;
+            }
+            if (continueSW) {
+                newPosition = myPosition.translate(-spaces, -spaces);
+                if (newPosition.inBounds() && board.canMoveOrCapture(newPosition, pieceColor)) {
+                    moves.add(new ChessMove(myPosition, newPosition, null));
+                    if (board.getPiece(newPosition) != null) continueNE = false;
+                }
+                else continueSW = false;
+            }
+        }
+        return moves;
+    }
 
     /**
      * Returns a collection containing a knight's potential moves
