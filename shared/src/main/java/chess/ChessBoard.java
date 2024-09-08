@@ -139,4 +139,13 @@ public class ChessBoard {
         return piece.getTeamColor() != color;
     }
 
+    /**
+     * Returns whether a given position is empty or occupied by an enemy piece.
+     * @param pos The position to check
+     * @param color The friendly piece's color
+     * @return Whether the given position is empty or occupied by an enemy piece
+     */
+    public boolean canMoveOrCapture(ChessPosition pos, ChessGame.TeamColor color) {
+        return getPiece(pos) == null || positionBlockedByEnemy(pos, color);
+    }
 }
