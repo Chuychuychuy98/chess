@@ -142,7 +142,7 @@ public class ChessPiece {
                 newPosition = myPosition.translate(-spaces, spaces);
                 if (board.canMoveOrCapture(newPosition, pieceColor)) {
                     moves.add(new ChessMove(myPosition, newPosition, null));
-                    if (board.getPiece(newPosition) != null) continueNE = false;
+                    if (board.getPiece(newPosition) != null) continueSE = false;
                 }
                 else continueSE = false;
             }
@@ -150,7 +150,7 @@ public class ChessPiece {
                 newPosition = myPosition.translate(spaces, -spaces);
                 if (board.canMoveOrCapture(newPosition, pieceColor)) {
                     moves.add(new ChessMove(myPosition, newPosition, null));
-                    if (board.getPiece(newPosition) != null) continueNE = false;
+                    if (board.getPiece(newPosition) != null) continueNW = false;
                 }
                 else continueNW = false;
             }
@@ -158,7 +158,7 @@ public class ChessPiece {
                 newPosition = myPosition.translate(-spaces, -spaces);
                 if (board.canMoveOrCapture(newPosition, pieceColor)) {
                     moves.add(new ChessMove(myPosition, newPosition, null));
-                    if (board.getPiece(newPosition) != null) continueNE = false;
+                    if (board.getPiece(newPosition) != null) continueSW = false;
                 }
                 else continueSW = false;
             }
