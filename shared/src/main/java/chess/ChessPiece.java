@@ -14,6 +14,15 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
     private final ChessPiece.PieceType type;
+
+    public boolean isMovedBefore() {
+        return movedBefore;
+    }
+
+    public void setMovedBefore(boolean movedBefore) {
+        this.movedBefore = movedBefore;
+    }
+
     private boolean movedBefore = false;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
