@@ -30,7 +30,8 @@ public class ChessBoard {
     }
 
     public void copyBoard(ChessBoard copy) {
-        for (ChessPosition position : board.keySet()) {
+        board.clear();
+        for (ChessPosition position : copy.board.keySet()) {
             board.put(position, copy.board.get(position));
         }
     }
