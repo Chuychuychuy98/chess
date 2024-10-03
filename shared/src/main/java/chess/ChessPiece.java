@@ -22,7 +22,7 @@ public class ChessPiece {
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type, boolean moved) {
         this.pieceColor = pieceColor;
         this.type = type;
-        this.moved = false;
+        this.moved = moved;
     }
 
     public boolean hasMoved() {
