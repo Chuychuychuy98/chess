@@ -22,14 +22,18 @@ public class ChessBoard {
         ChessBoard chessBoard = new ChessBoard();
         for (int i = 0; i < BOARD_ROWS; i++) {
             for (int j = 0; j < BOARD_COLS; j++) {
-                chessBoard.getBoard()[i][j] = board[i][j];
+                chessBoard.board[i][j] = board[i][j];
             }
         }
         return chessBoard;
     }
 
-    public ChessPiece[][] getBoard() {
-        return board;
+    public void copyBoard(ChessBoard copy) {
+        for (int i = 0; i < BOARD_ROWS; i++) {
+            for (int j = 0; j < BOARD_COLS; j++) {
+                board[i][j] = copy.board[i][j];
+            }
+        }
     }
 
     @Override
