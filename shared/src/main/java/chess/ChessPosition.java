@@ -14,7 +14,7 @@ public class ChessPosition {
     private final int col;
     private static final ChessPosition[][] POSITIONS = new ChessPosition[8][8];
 
-    private ChessPosition(int row, int col) {
+    public ChessPosition(int row, int col) {
         this.row = row;
         this.col = col;
     }
