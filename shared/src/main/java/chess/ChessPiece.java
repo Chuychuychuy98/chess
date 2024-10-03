@@ -13,7 +13,7 @@ import java.util.Objects;
 public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
-    private final ChessPiece.PieceType type;
+    private ChessPiece.PieceType type;
     private boolean moved;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
@@ -311,5 +311,9 @@ public class ChessPiece {
         }
 
         return moves;
+    }
+
+    public void setPieceType(PieceType type) {
+        this.type = type;
     }
 }
