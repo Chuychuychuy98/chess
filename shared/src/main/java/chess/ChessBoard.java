@@ -11,10 +11,6 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-
-//    private final int BOARD_ROWS = 8;
-//    private final int BOARD_COLS = 8;
-//    private final ChessPiece[][] board = new ChessPiece[BOARD_ROWS][BOARD_COLS];
     private final Map<ChessPosition, ChessPiece> board = new HashMap<>();
 
     public ChessBoard() {
