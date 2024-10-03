@@ -12,10 +12,18 @@ public class ChessPosition {
 
     private final int row;
     private final int col;
+    private static final ChessPosition[][] POSITIONS = new ChessPosition[8][8];
 
-    public ChessPosition(int row, int col) {
+    private ChessPosition(int row, int col) {
         this.row = row;
         this.col = col;
+    }
+
+    public static ChessPosition getPosition(int row, int col) {
+        if (POSITIONS[row-1][col-1] == null) {
+            POSITIONS[row-1][col-1] = new ChessPosition(row, col);
+        }
+        return POSITIONS[row-1][col-1];
     }
 
     /**
