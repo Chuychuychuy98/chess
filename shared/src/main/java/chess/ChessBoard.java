@@ -40,14 +40,14 @@ public class ChessBoard {
         ChessPiece pieceToMove = getPiece(move.getStartPosition());
         pieceToMove.setMoved();
         removePiece(move.getStartPosition());
-        addPiece(move.getEndPosition(), pieceToMove);
+        addOrCapture(move.getEndPosition(), pieceToMove);
 
     }
 
     public void simMove(ChessMove move) {
         ChessPiece pieceToMove = getPiece(move.getStartPosition()).movedCopy();
         removePiece(move.getStartPosition());
-        addPiece(move.getEndPosition(), pieceToMove);
+        addOrCapture(move.getEndPosition(), pieceToMove);
     }
 
     public void removePiece(ChessPosition position) {
@@ -90,6 +90,10 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         board.putIfAbsent(position, piece);
+    }
+
+    public void addOrCapture(ChessPosition position, ChessPiece piece) {
+        board.put(position, piece);
     }
 
     /**
