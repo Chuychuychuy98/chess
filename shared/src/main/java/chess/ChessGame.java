@@ -13,7 +13,7 @@ import java.util.Map;
 public class ChessGame {
 
     private TeamColor turn = TeamColor.WHITE;
-    private ChessBoard board = new ChessBoard();
+    private ChessBoard board = ChessBoard.defaultBoard();
 
     public ChessGame() {
 

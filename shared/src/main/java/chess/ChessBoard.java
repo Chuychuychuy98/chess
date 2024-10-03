@@ -14,7 +14,13 @@ public class ChessBoard {
     private final Map<ChessPosition, ChessPiece> pieces = new HashMap<>();
 
     public ChessBoard() {
-        
+
+    }
+
+    public static ChessBoard defaultBoard() {
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
+        return board;
     }
 
     public ChessBoard copyOf() {
