@@ -185,4 +185,8 @@ public class ChessBoard {
         }
         return false;
     }
+
+    public Map<ChessPosition, ChessPiece> getPieces() {
+        return pieces;
+    }
 }
