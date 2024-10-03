@@ -112,11 +112,11 @@ public class ChessGame {
     public boolean isInStalemate(TeamColor teamColor) {
         Map<ChessPosition, ChessPiece> pieces = board.getPieces();
         for (ChessPosition pos : pieces.keySet()) {
-            if (!validMoves(pos).isEmpty()) {
-                return true;
+            if (pieces.get(pos).getTeamColor() == teamColor && !validMoves(pos).isEmpty()) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     /**
