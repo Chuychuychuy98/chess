@@ -51,8 +51,8 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece toMove = board.getPiece(startPosition);
-        TeamColor color = toMove.getTeamColor();
         if (toMove == null) return null;
+        TeamColor color = toMove.getTeamColor();
         Collection<ChessMove> allMoves = toMove.pieceMoves(board, startPosition);
         Collection<ChessMove> validMoves = new HashSet<>();
         ChessBoard simBoard = board.copyOf();
