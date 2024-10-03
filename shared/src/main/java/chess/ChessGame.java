@@ -51,13 +51,14 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece toMove = board.getPiece(startPosition);
+        TeamColor color = toMove.getTeamColor();
         if (toMove == null) return null;
         Collection<ChessMove> allMoves = toMove.pieceMoves(board, startPosition);
         Collection<ChessMove> validMoves = new HashSet<>();
         ChessBoard simBoard = board.copyOf();
         for (ChessMove move : allMoves) {
             simBoard.simMove(move);
-            if (!simBoard.isInCheck(turn)) validMoves.add(move);
+            if (!simBoard.isInCheck(color)) validMoves.add(move);
             simBoard.copyBoard(board);
         }
         return validMoves;
