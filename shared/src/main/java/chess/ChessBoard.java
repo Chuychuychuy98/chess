@@ -34,6 +34,9 @@ public class ChessBoard {
 
     public void doMove(ChessMove move) {
         ChessPiece pieceToMove = getPiece(move.getStartPosition());
+        if (move.getPromotionPiece() != null) {
+            pieceToMove.setPieceType(move.getPromotionPiece());
+        }
         pieceToMove.setMoved();
         removePiece(move.getStartPosition());
         addOrCapture(move.getEndPosition(), pieceToMove);
