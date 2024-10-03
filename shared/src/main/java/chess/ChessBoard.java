@@ -18,6 +18,20 @@ public class ChessBoard {
         
     }
 
+    public ChessBoard copyOf() {
+        ChessBoard chessBoard = new ChessBoard();
+        for (int i = 0; i < BOARD_ROWS; i++) {
+            for (int j = 0; j < BOARD_COLS; j++) {
+                chessBoard.getBoard()[i][j] = board[i][j];
+            }
+        }
+        return chessBoard;
+    }
+
+    public ChessPiece[][] getBoard() {
+        return board;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
