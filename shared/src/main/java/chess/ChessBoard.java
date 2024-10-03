@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -10,9 +12,10 @@ import java.util.Objects;
  */
 public class ChessBoard {
 
-    private final int BOARD_ROWS = 8;
-    private final int BOARD_COLS = 8;
-    private final ChessPiece[][] board = new ChessPiece[BOARD_ROWS][BOARD_COLS];
+//    private final int BOARD_ROWS = 8;
+//    private final int BOARD_COLS = 8;
+//    private final ChessPiece[][] board = new ChessPiece[BOARD_ROWS][BOARD_COLS];
+    private final Map<ChessPosition, ChessPiece> board = new HashMap<>();
 
     public ChessBoard() {
         
@@ -20,19 +23,15 @@ public class ChessBoard {
 
     public ChessBoard copyOf() {
         ChessBoard chessBoard = new ChessBoard();
-        for (int i = 0; i < BOARD_ROWS; i++) {
-            for (int j = 0; j < BOARD_COLS; j++) {
-                chessBoard.board[i][j] = board[i][j];
-            }
+        for (ChessPosition position : board.keySet()) {
+            chessBoard.board.put(position, board.get(position));
         }
         return chessBoard;
     }
 
     public void copyBoard(ChessBoard copy) {
-        for (int i = 0; i < BOARD_ROWS; i++) {
-            for (int j = 0; j < BOARD_COLS; j++) {
-                board[i][j] = copy.board[i][j];
-            }
+        for (ChessPosition position : board.keySet()) {
+            board.put(position, copy.board.get(position));
         }
     }
 
@@ -51,7 +50,7 @@ public class ChessBoard {
     }
 
     public void removePiece(ChessPosition position) {
-        board[position.getRow() - 1][position.getColumn() - 1] = null;
+        board.remove(position);
     }
 
     @Override
@@ -59,23 +58,7 @@ public class ChessBoard {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessBoard that = (ChessBoard) o;
-
-        for (int i = 0; i < BOARD_ROWS; i++) {
-            for (int j = 0; j < BOARD_COLS; j++) {
-                if (board[i][j] == null) {
-                    if (that.board[i][j] != null) {
-                        return false;
-                    }
-                }
-                else if (that.board[i][j] == null) {
-                    return false;
-                }
-                else if (!board[i][j].equals(that.board[i][j])) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return Objects.equals(board, that.board);
     }
 
     @Override
@@ -83,14 +66,14 @@ public class ChessBoard {
         return Objects.hashCode(board);
     }
 
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 8; i++) {
+        for (int i = 1; i <= 8; i++) {
             sb.append("|");
-            for (int j = 0; j < 8; j++) {
-                sb.append(board[i][j] != null ? board[i][j].toString() : " ");
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition cur = ChessPosition.getPosition(i,j);
+                sb.append(board.get(cur) != null ? board.get(cur).toString() : " ");
                 sb.append("|");
             }
             sb.append("\n");
@@ -105,9 +88,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        if (board[position.getRow()-1][position.getColumn()-1] == null) {
-            board[position.getRow()-1][position.getColumn()-1] = piece;
-        }
+        board.putIfAbsent(position, piece);
     }
 
     /**
@@ -118,7 +99,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[position.getRow()-1][position.getColumn()-1];
+        return board.get(position);
     }
 
     /**
@@ -127,14 +108,14 @@ public class ChessBoard {
      * @param color The color of the pieces.
      */
     private void placeSpecialPieces(int row, ChessGame.TeamColor color) {
-        board[row][0] = new ChessPiece(color, ChessPiece.PieceType.ROOK);
-        board[row][1] = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
-        board[row][2] = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
-        board[row][3] = new ChessPiece(color, ChessPiece.PieceType.QUEEN);
-        board[row][4] = new ChessPiece(color, ChessPiece.PieceType.KING);
-        board[row][5] = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
-        board[row][6] = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
-        board[row][7] = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+        board.put(ChessPosition.getPosition(row, 1), new ChessPiece(color, ChessPiece.PieceType.ROOK));
+        board.put(ChessPosition.getPosition(row, 2), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
+        board.put(ChessPosition.getPosition(row, 3), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
+        board.put(ChessPosition.getPosition(row, 4), new ChessPiece(color, ChessPiece.PieceType.QUEEN));
+        board.put(ChessPosition.getPosition(row, 5), new ChessPiece(color, ChessPiece.PieceType.KING));
+        board.put(ChessPosition.getPosition(row, 6), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
+        board.put(ChessPosition.getPosition(row, 7), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
+        board.put(ChessPosition.getPosition(row, 8), new ChessPiece(color, ChessPiece.PieceType.ROOK));
     }
 
     /**
@@ -143,8 +124,8 @@ public class ChessBoard {
      * @param color The color of the pawns.
      */
     private void placePawns(int row, ChessGame.TeamColor color) {
-        for (int i = 0; i < BOARD_COLS; i++) {
-            board[row][i] = new ChessPiece(color, ChessPiece.PieceType.PAWN);
+        for (int i = 1; i <= 8; i++) {
+            board.put(ChessPosition.getPosition(row, i), new ChessPiece(color, ChessPiece.PieceType.PAWN));
         }
     }
 
@@ -153,11 +134,11 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        placeSpecialPieces(0, ChessGame.TeamColor.WHITE);
-        placeSpecialPieces(7, ChessGame.TeamColor.BLACK);
+        placeSpecialPieces(1, ChessGame.TeamColor.WHITE);
+        placeSpecialPieces(8, ChessGame.TeamColor.BLACK);
 
-        placePawns(1, ChessGame.TeamColor.WHITE);
-        placePawns(6, ChessGame.TeamColor.BLACK);
+        placePawns(2, ChessGame.TeamColor.WHITE);
+        placePawns(7, ChessGame.TeamColor.BLACK);
     }
 
     /**
