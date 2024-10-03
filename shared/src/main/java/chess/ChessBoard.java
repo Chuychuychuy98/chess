@@ -35,6 +35,21 @@ public class ChessBoard {
             }
         }
     }
+
+    public void doMove(ChessMove move) {
+        ChessPiece pieceToMove = getPiece(move.getStartPosition());
+        pieceToMove.setMoved();
+        removePiece(move.getStartPosition());
+        addPiece(move.getEndPosition(), pieceToMove);
+
+    }
+
+    public void simMove(ChessMove move) {
+        ChessPiece pieceToMove = getPiece(move.getStartPosition()).movedCopy();
+        removePiece(move.getStartPosition());
+        addPiece(move.getEndPosition(), pieceToMove);
+    }
+
     public void removePiece(ChessPosition position) {
         board[position.getRow() - 1][position.getColumn() - 1] = null;
     }
