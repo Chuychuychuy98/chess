@@ -164,6 +164,25 @@ public class ChessBoard {
     }
 
     public boolean isInCheck(ChessGame.TeamColor team) {
-        return true;
+        ChessPosition kingPos = null;
+        for (ChessPosition pos : board.keySet()) {
+            ChessPiece piece = board.get(pos);
+            if (piece != null && piece.getTeamColor() == team && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                kingPos = pos;
+                break;
+            }
+        }
+
+        for (ChessPosition pos : board.keySet()) {
+            ChessPiece attacker = board.get(pos);
+            if (attacker != null && attacker.getTeamColor() != team) {
+                for (ChessMove move : attacker.pieceMoves(this, pos)) {
+                    if (move.getEndPosition().equals(kingPos)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
