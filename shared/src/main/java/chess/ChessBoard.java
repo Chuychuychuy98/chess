@@ -181,4 +181,8 @@ public class ChessBoard {
     public boolean canMoveOrCapture(ChessPosition pos, ChessGame.TeamColor color) {
         return pos.inBounds() && (getPiece(pos) == null || positionBlockedByEnemy(pos, color));
     }
+
+    public boolean isInCheck(ChessGame.TeamColor team) {
+        return true;
+    }
 }
