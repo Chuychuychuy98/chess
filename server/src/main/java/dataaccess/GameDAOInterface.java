@@ -22,7 +22,7 @@ public interface GameDAOInterface {
     /**
      * Retrieve a specified game with the given gameID.
      * @param gameID The ID of the game to retrieve.
-     * @return GameData with the specified gameID, or null if not found.
+     * @return GameData with the specified gameID.
      * @throws EntryNotFoundException Indicates that the gameID is not found in the database.
      * @throws DataAccessException Indicates an error reaching the database.
      */
