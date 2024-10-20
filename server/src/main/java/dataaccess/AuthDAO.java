@@ -14,8 +14,9 @@ public interface AuthDAO {
      * Create a new authorization in the database.
      * @param authData The authData to add to the database.
      * @throws DataAccessException Indicates an error reaching the database.
+     * @throws DuplicateEntryException Indicates that the given username is already associated with an authToken.
      */
-    void createAuth(AuthData authData) throws DataAccessException;
+    void createAuth(AuthData authData) throws DataAccessException, DuplicateEntryException;
 
     /**
      * Retrieve an authorization given an authToken.
