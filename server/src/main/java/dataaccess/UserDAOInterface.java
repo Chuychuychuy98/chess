@@ -11,12 +11,9 @@ public interface UserDAOInterface {
 
     /**
      * Create a new user.
-     * @param username The user's username.
-     * @param password The user's password.
-     * @param email The user's email address.
-     * @return UserData representing the new user.
+     * @param userData The data to add to the database.
      */
-    UserData createUser(String username, String password, String email);
+    void createUser(UserData userData);
 
     /**
      * Retrieve a user with the given username.
