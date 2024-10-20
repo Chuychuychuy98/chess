@@ -17,7 +17,7 @@ public interface GameDAOInterface {
      * @throws DuplicateEntryException Indicates that the gameID was already taken.
      * @throws DataAccessException Indicates an error reaching the database.
      */
-    void createGame(GameData gameData) throws DataAccessException;
+    void createGame(GameData gameData) throws DataAccessException, DuplicateEntryException;
 
     /**
      * Retrieve a specified game with the given gameID.
@@ -26,7 +26,7 @@ public interface GameDAOInterface {
      * @throws EntryNotFoundException Indicates that the gameID is not found in the database.
      * @throws DataAccessException Indicates an error reaching the database.
      */
-    GameData getGame(int gameID) throws DataAccessException;
+    GameData getGame(int gameID) throws DataAccessException, EntryNotFoundException;
 
     /**
      * Retrieve all games.
@@ -42,6 +42,6 @@ public interface GameDAOInterface {
      * @throws EntryNotFoundException Indicates the given gameID is not found in the database.
      * @throws DataAccessException Indicates an error reaching the database.
      */
-    void updateGame(int gameID, ChessGame game) throws DataAccessException;
+    void updateGame(int gameID, ChessGame game) throws DataAccessException, EntryNotFoundException;
 
 }

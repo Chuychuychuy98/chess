@@ -16,7 +16,7 @@ public interface UserDAOInterface {
      * @throws DuplicateEntryException Indicates the username is already found in the database.
      * @throws DataAccessException Indicates an error reaching the database.
      */
-    void createUser(UserData userData) throws DataAccessException;
+    void createUser(UserData userData) throws DataAccessException, DuplicateEntryException;
 
     /**
      * Retrieve a user with the given username.
@@ -25,5 +25,5 @@ public interface UserDAOInterface {
      * @throws EntryNotFoundException Indicates that the given username is not found in the database.
      * @throws DataAccessException Indicates an error reaching the database.
      */
-    UserData getUser(String username) throws DataAccessException;
+    UserData getUser(String username) throws DataAccessException, EntryNotFoundException;
 }
