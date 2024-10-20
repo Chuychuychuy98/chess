@@ -2,7 +2,7 @@ package dataaccess;
 
 import model.AuthData;
 
-public interface AuthDAOInterface {
+public interface AuthDAO {
 
     /**
      * Clear all data from the database.

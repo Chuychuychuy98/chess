@@ -2,7 +2,7 @@ package dataaccess;
 
 import model.UserData;
 
-public interface UserDAOInterface {
+public interface UserDAO {
 
     /**
      * Clear all data from the database.

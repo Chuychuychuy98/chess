@@ -3,7 +3,7 @@ package dataaccess;
 import chess.ChessGame;
 import model.GameData;
 
-public interface GameDAOInterface {
+public interface GameDAO {
 
     /**
      * Clear all data from the database.
