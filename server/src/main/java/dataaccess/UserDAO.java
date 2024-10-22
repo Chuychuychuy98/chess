@@ -26,4 +26,12 @@ public interface UserDAO {
      * @throws DataAccessException Indicates an error reaching the database.
      */
     UserData getUser(String username) throws DataAccessException, EntryNotFoundException;
+
+    /**
+     * Remove a user with the given username.
+     * @param username The username of the user to remove.
+     * @throws EntryNotFoundException Indicates that the given username is not found in the database.
+     * @throws DataAccessException Indicates an error reaching the database.
+     */
+    void removeUser(String username) throws DataAccessException, EntryNotFoundException;
 }

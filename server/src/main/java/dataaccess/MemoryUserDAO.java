@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Memory implementation of UserDAO
  */
-public class MemoryUserDAO implements UserDAO{
+public class MemoryUserDAO implements UserDAO {
 
     Map<String, UserData> database = new HashMap<>();
 
@@ -30,5 +30,10 @@ public class MemoryUserDAO implements UserDAO{
         UserData data = database.get(username);
         if (data == null) throw new EntryNotFoundException(String.format("No user found with username %s.", username));
         return data;
+    }
+
+    @Override
+    public void removeUser(String username) throws EntryNotFoundException {
+        if (database.remove(username) == null) throw new EntryNotFoundException(String.format("No user found with username %s.", username));
     }
 }
