@@ -3,7 +3,7 @@ package service;
 import dataaccess.*;
 import org.junit.jupiter.api.*;
 import request.LoginRequest;
-import request.LogoutRequest;
+import request.AuthTokenRequest;
 import request.RegisterRequest;
 
 
@@ -69,12 +69,12 @@ public class ServiceTests {
     public void successLogout() {
         Assertions.assertDoesNotThrow(() -> {
             String authToken = userService.register(new RegisterRequest("myName", "myPass", "email@email.org")).authToken();
-            userService.logout(new LogoutRequest(authToken));
+            userService.logout(new AuthTokenRequest(authToken));
         });
     }
 
     @Test
     public void logoutNonExistent() {
-        Assertions.assertThrows(UnauthorizedException.class, () -> userService.logout(new LogoutRequest("abc")));
+        Assertions.assertThrows(UnauthorizedException.class, () -> userService.logout(new AuthTokenRequest("abc")));
     }
 }

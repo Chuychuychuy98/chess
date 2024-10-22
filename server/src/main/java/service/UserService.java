@@ -4,7 +4,7 @@ import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 import request.LoginRequest;
-import request.LogoutRequest;
+import request.AuthTokenRequest;
 import request.RegisterRequest;
 import result.AuthTokenResult;
 
@@ -79,7 +79,7 @@ public class UserService {
      * @throws DataAccessException Indicates an error reaching the database.
      * @throws UnauthorizedException Indicates that the authToken is not in the database.
      */
-    public void logout(LogoutRequest request) throws DataAccessException, UnauthorizedException {
+    public void logout(AuthTokenRequest request) throws DataAccessException, UnauthorizedException {
         authDAO.deleteAuth(request.authToken());
     }
 }
