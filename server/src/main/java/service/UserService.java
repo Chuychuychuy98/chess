@@ -4,6 +4,7 @@ import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 import request.LoginRequest;
+import request.LogoutRequest;
 import request.RegisterRequest;
 import result.AuthTokenResult;
 
@@ -70,5 +71,15 @@ public class UserService {
             return new AuthTokenResult(newAuth);
         }
         throw new UnauthorizedException("Error: unauthorized.");
+    }
+
+    /**
+     * Log a user out by deleting their authToken if it exists.
+     * @param request LogoutRequest containing the authToken to delete.
+     * @throws DataAccessException Indicates an error reaching the database.
+     * @throws UnauthorizedException Indicates that the authToken is not in the database.
+     */
+    public void logout(LogoutRequest request) throws DataAccessException, UnauthorizedException {
+        authDAO.deleteAuth(request.authToken());
     }
 }
