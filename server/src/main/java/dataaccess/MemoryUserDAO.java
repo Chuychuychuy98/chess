@@ -22,7 +22,7 @@ public class MemoryUserDAO implements UserDAO {
     @Override
     public void createUser(UserData userData) throws DuplicateEntryException {
         if (database.get(userData.username()) != null) {
-            throw new DuplicateEntryException(String.format("Username %s is taken.", userData.username()));
+            throw new DuplicateEntryException("Error: already taken");
         }
         database.put(userData.username(), userData);
     }
