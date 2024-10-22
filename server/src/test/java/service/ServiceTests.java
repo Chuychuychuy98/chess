@@ -1,6 +1,8 @@
 package service;
 
 import dataaccess.*;
+import model.GameData;
+import model.UserData;
 import org.junit.jupiter.api.*;
 import request.CreateGameRequest;
 import request.LoginRequest;
@@ -36,8 +38,10 @@ public class ServiceTests {
 
     @Test
     public void successRegister() {
-        Assertions.assertDoesNotThrow(() ->
-                userService.register(new RegisterRequest("myName", "myPass", "email@email.org")));
+        Assertions.assertDoesNotThrow(() -> {
+                userService.register(new RegisterRequest("myName", "myPass", "email@email.org"));
+                Assertions.assertEquals(new UserData("myName", "myPass", "email@email.org"), userDAO.getUser("myName"));
+        });
     }
 
     @Test
@@ -73,9 +77,18 @@ public class ServiceTests {
     }
 
     @Test
-    public void successLogout() {
+    public void successLogoutNoThrow() {
         Assertions.assertDoesNotThrow(() -> {
             String authToken = userService.register(new RegisterRequest("myName", "myPass", "email@email.org")).authToken();
+            userService.logout(new AuthTokenRequest(authToken));
+        });
+    }
+
+    @Test
+    public void logoutActuallyDeleted() {
+        Assertions.assertThrows(UnauthorizedException.class, () -> {
+            String authToken = userService.register(new RegisterRequest("myName", "myPass", "email@email.org")).authToken();
+            userService.logout(new AuthTokenRequest(authToken));
             userService.logout(new AuthTokenRequest(authToken));
         });
     }
@@ -99,7 +112,9 @@ public class ServiceTests {
             String authToken = userService.register(new RegisterRequest("myName", "myPass", "email@email.org")).authToken();
             gameService.create(new CreateGameRequest(authToken, "game1"));
             gameService.create(new CreateGameRequest(authToken, "game2"));
-            gameService.list(new AuthTokenRequest(authToken));
+            GameData[] games = gameService.list(new AuthTokenRequest(authToken)).games();
+            Assertions.assertEquals("game1", games[0].gameName());
+            Assertions.assertEquals("game2", games[1].gameName());
         });
     }
 
@@ -112,7 +127,8 @@ public class ServiceTests {
     public void successCreateGame() {
         Assertions.assertDoesNotThrow(() -> {
             String authToken = userService.register(new RegisterRequest("myName", "myPass", "email@email.org")).authToken();
-            gameService.create(new CreateGameRequest(authToken, "game"));
+            int id = gameService.create(new CreateGameRequest(authToken, "game")).gameID();
+            Assertions.assertEquals("game", gameDAO.getGame(id).gameName());
         });
     }
 
