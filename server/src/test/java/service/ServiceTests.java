@@ -1,13 +1,11 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.*;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
-import request.CreateGameRequest;
-import request.LoginRequest;
-import request.AuthTokenRequest;
-import request.RegisterRequest;
+import request.*;
 
 
 public class ServiceTests {
@@ -136,5 +134,45 @@ public class ServiceTests {
     public void createGameUnauthorized() {
         Assertions.assertThrows(UnauthorizedException.class, () ->
                 gameService.create(new CreateGameRequest("abc", "game")));
+    }
+
+    @Test
+    public void joinGameSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            String authToken1 = userService.register(new RegisterRequest("myName", "myPass", "email@email.org")).authToken();
+            String authToken2 = userService.register(new RegisterRequest("second", "two", "email@email.org")).authToken();
+            int id = gameService.create(new CreateGameRequest(authToken1, "game")).gameID();
+            gameService.join(new JoinRequest(authToken1, ChessGame.TeamColor.BLACK, id));
+            gameService.join(new JoinRequest(authToken2, ChessGame.TeamColor.WHITE, id));
+            GameData game = gameDAO.getGame(id);
+            Assertions.assertEquals("myName", game.blackUsername());
+            Assertions.assertEquals("second", game.whiteUsername());
+        });
+    }
+
+    @Test
+    public void joinNonexistentGame() {
+        Assertions.assertThrows(EntryNotFoundException.class, () -> {
+            String authToken = userService.register(new RegisterRequest("myName", "myPass", "email@email.org")).authToken();
+            gameService.join(new JoinRequest(authToken, ChessGame.TeamColor.BLACK, 100));
+        });
+    }
+
+    @Test
+    public void joinGameUnauthorized() {
+        Assertions.assertThrows(UnauthorizedException.class, () -> {
+            gameService.join(new JoinRequest("asdf", ChessGame.TeamColor.BLACK, 100));
+        });
+    }
+
+    @Test
+    public void joinGameColorTaken() {
+        Assertions.assertThrows(TeamColorTakenException.class, () -> {
+            String authToken1 = userService.register(new RegisterRequest("myName", "myPass", "email@email.org")).authToken();
+            String authToken2 = userService.register(new RegisterRequest("second", "two", "email@email.org")).authToken();
+            int id = gameService.create(new CreateGameRequest(authToken1, "game")).gameID();
+            gameService.join(new JoinRequest(authToken1, ChessGame.TeamColor.BLACK, id));
+            gameService.join(new JoinRequest(authToken2, ChessGame.TeamColor.BLACK, id));
+        });
     }
 }
