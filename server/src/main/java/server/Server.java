@@ -36,6 +36,8 @@ public class Server {
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
         Spark.get("/game", this::list);
+        Spark.post("/game", this::create);
+        Spark.put("/game", this::join);
 
         Spark.exception(DataAccessException.class, this::otherExceptionHandler);
         Spark.exception(EntryNotFoundException.class, this::otherExceptionHandler);
@@ -114,4 +116,30 @@ public class Server {
         return new Gson().toJson(gameService.list(new AuthTokenRequest(authToken)));
     }
 
+    private Object create(Request req, Response res) throws UnauthorizedException, DuplicateEntryException, DataAccessException, BadRequestException {
+        String authToken = req.headers("authorization");
+        checkAuthToken(authToken);
+        CreateGameRequest createGameRequest = new Gson().fromJson(req.body(), CreateGameRequest.class);
+        if (createGameRequest.gameName() == null) {
+            throw new BadRequestException("Error: bad request");
+        }
+        return new Gson().toJson(gameService.create(createGameRequest, new AuthTokenRequest(authToken)));
+    }
+
+    private Object join(Request req, Response res) throws BadRequestException, UnauthorizedException, EntryNotFoundException, TeamColorTakenException, DataAccessException {
+        String authToken = req.headers("authorization");
+        checkAuthToken(authToken);
+        JoinRequest joinRequest = new Gson().fromJson(req.body(), JoinRequest.class);
+        if (joinRequest.color() == null) {
+            throw new BadRequestException("Error: bad request");
+        }
+        gameService.join(joinRequest, new AuthTokenRequest(authToken));
+        return "";
+    }
+
+    private void checkAuthToken(String authToken) throws UnauthorizedException {
+        if (authToken == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+    }
 }
