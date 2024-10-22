@@ -1,5 +1,7 @@
 package dataaccess;
 
+import exceptions.DuplicateEntryException;
+import exceptions.UnauthorizedException;
 import model.AuthData;
 
 public interface AuthDAO {

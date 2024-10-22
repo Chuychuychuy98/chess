@@ -1,6 +1,8 @@
 package dataaccess;
 
 import chess.ChessGame;
+import exceptions.DuplicateEntryException;
+import exceptions.EntryNotFoundException;
 import model.GameData;
 
 public interface GameDAO {

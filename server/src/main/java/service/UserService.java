@@ -1,6 +1,9 @@
 package service;
 
 import dataaccess.*;
+import exceptions.DuplicateEntryException;
+import exceptions.EntryNotFoundException;
+import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.UserData;
 import request.LoginRequest;

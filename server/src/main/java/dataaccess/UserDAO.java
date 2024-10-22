@@ -1,5 +1,7 @@
 package dataaccess;
 
+import exceptions.DuplicateEntryException;
+import exceptions.EntryNotFoundException;
 import model.UserData;
 
 public interface UserDAO {

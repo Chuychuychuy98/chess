@@ -2,6 +2,10 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.*;
+import exceptions.DuplicateEntryException;
+import exceptions.EntryNotFoundException;
+import exceptions.TeamColorTakenException;
+import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
 import request.AuthTokenRequest;
