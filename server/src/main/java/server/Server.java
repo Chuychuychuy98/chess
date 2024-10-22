@@ -126,14 +126,18 @@ public class Server {
         return new Gson().toJson(gameService.create(createGameRequest, new AuthTokenRequest(authToken)));
     }
 
-    private Object join(Request req, Response res) throws BadRequestException, UnauthorizedException, EntryNotFoundException, TeamColorTakenException, DataAccessException {
+    private Object join(Request req, Response res) throws BadRequestException, UnauthorizedException, TeamColorTakenException, DataAccessException {
         String authToken = req.headers("authorization");
         checkAuthToken(authToken);
         JoinRequest joinRequest = new Gson().fromJson(req.body(), JoinRequest.class);
         if (joinRequest.playerColor() == null) {
             throw new BadRequestException("Error: bad request");
         }
-        gameService.join(joinRequest, new AuthTokenRequest(authToken));
+        try {
+            gameService.join(joinRequest, new AuthTokenRequest(authToken));
+        } catch (EntryNotFoundException ex) {
+            throw new BadRequestException("Error: bad request");
+        }
         return "";
     }
 
