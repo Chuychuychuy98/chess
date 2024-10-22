@@ -22,7 +22,7 @@ public interface AuthDAO {
      * Retrieve an authorization given an authToken.
      * @param authToken The token to search for.
      * @return AuthData for the requested authToken.
-     * @throws EntryNotFoundException Indicates that the given authToken is not found in the database.
+     * @throws UnauthorizedException Indicates that the given authToken is not found in the database.
      * @throws DataAccessException Indicates an error reaching the database.
      */
     AuthData getAuth(String authToken) throws DataAccessException, UnauthorizedException;
@@ -31,6 +31,7 @@ public interface AuthDAO {
      * Delete an authorization so that it is no longer valid.
      * @param authData The authorization to delete.
      * @throws EntryNotFoundException Indicates that the given authData is not found in the database.
+     * @throws UnauthorizedException Indicates that the given authData is not found in the database.
      * @throws DataAccessException Indicates an error reaching the database.
      */
     void deleteAuth(AuthData authData) throws DataAccessException, UnauthorizedException;
