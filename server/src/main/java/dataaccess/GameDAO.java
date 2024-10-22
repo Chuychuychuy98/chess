@@ -38,10 +38,10 @@ public interface GameDAO {
     GameData[] listGames() throws DataAccessException;
 
     /**
-     * Update the game with the given ID so that its player of the given color now has the new username.
+     * Update the game with the given ID so that its player of the given playerColor now has the new username.
      * @param gameID The ID of the game being updated.
-     * @param color The color of the player being replaced.
-     * @param newUsername The new username associated with the given color.
+     * @param color The playerColor of the player being replaced.
+     * @param newUsername The new username associated with the given playerColor.
      * @throws EntryNotFoundException Indicates the given gameID is not found in the database.
      * @throws DataAccessException Indicates an error reaching the database.
      */

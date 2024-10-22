@@ -130,7 +130,7 @@ public class Server {
         String authToken = req.headers("authorization");
         checkAuthToken(authToken);
         JoinRequest joinRequest = new Gson().fromJson(req.body(), JoinRequest.class);
-        if (joinRequest.color() == null) {
+        if (joinRequest.playerColor() == null) {
             throw new BadRequestException("Error: bad request");
         }
         gameService.join(joinRequest, new AuthTokenRequest(authToken));

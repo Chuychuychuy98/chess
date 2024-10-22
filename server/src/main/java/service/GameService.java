@@ -61,20 +61,20 @@ public class GameService {
 
     /**
      * Add a player to a game.
-     * @param request JoinRequest containing the gameID to join and the color to join as.
+     * @param request JoinRequest containing the gameID to join and the playerColor to join as.
      * @param authTokenRequest AuthTokenRequest containing the authToken to validate.
      * @throws DataAccessException Indicates an error reaching the database.
      * @throws UnauthorizedException Indicates that the authToken is not found in the database.
-     * @throws TeamColorTakenException Indicates that the requested color is not available for the requested game.
+     * @throws TeamColorTakenException Indicates that the requested playerColor is not available for the requested game.
      * @throws EntryNotFoundException Indicates that the gameID is not found in the database.
      */
     public void join(JoinRequest request, AuthTokenRequest authTokenRequest) throws DataAccessException, UnauthorizedException, TeamColorTakenException, EntryNotFoundException {
         AuthData auth = authDAO.getAuth(authTokenRequest.authToken());
         GameData game = gameDAO.getGame(request.gameID());
-        if ((request.color() == ChessGame.TeamColor.BLACK && game.blackUsername() != null) ||
-            (request.color() == ChessGame.TeamColor.WHITE && game.whiteUsername() != null)) {
+        if ((request.playerColor() == ChessGame.TeamColor.BLACK && game.blackUsername() != null) ||
+            (request.playerColor() == ChessGame.TeamColor.WHITE && game.whiteUsername() != null)) {
             throw new TeamColorTakenException("Error: already taken");
         }
-        gameDAO.updateGame(request.gameID(), request.color(), auth.username());
+        gameDAO.updateGame(request.gameID(), request.playerColor(), auth.username());
     }
 }
