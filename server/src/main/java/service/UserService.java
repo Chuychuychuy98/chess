@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
+import request.LoginRequest;
 import request.RegisterRequest;
 import result.AuthTokenResult;
 
@@ -37,5 +38,21 @@ public class UserService {
             throw e;
         }
         return new AuthTokenResult(newAuth);
+    }
+
+    public AuthTokenResult login(LoginRequest request) throws DataAccessException, UnauthorizedException, DuplicateEntryException {
+        UserData user;
+        try {
+            user = userDAO.getUser(request.username());
+        }
+        catch (EntryNotFoundException e) {
+            throw new UnauthorizedException("Error: unauthorized.");
+        }
+        if (user.password().equals(request.password())) {
+            AuthData newAuth = new AuthData(UUID.randomUUID().toString(), user.username());
+            authDAO.createAuth(newAuth);
+            return new AuthTokenResult(newAuth);
+        }
+        throw new UnauthorizedException("Error: unauthorized.");
     }
 }
