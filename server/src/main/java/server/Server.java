@@ -6,6 +6,7 @@ import exceptions.BadRequestException;
 import exceptions.DuplicateEntryException;
 import exceptions.EntryNotFoundException;
 import exceptions.UnauthorizedException;
+import request.AuthTokenRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import service.ClearService;
@@ -38,6 +39,7 @@ public class Server {
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
+        Spark.delete("/session", this::logout);
 
         Spark.exception(DataAccessException.class, this::otherExceptionHandler);
         Spark.exception(EntryNotFoundException.class, this::otherExceptionHandler);
@@ -56,24 +58,28 @@ public class Server {
         Spark.awaitStop();
     }
 
+    private String formatError(String msg) {
+        return "{\"message\":\"" + msg + "\"}";
+    }
+
     private void otherExceptionHandler(Exception ex, Request req, Response res) {
         res.status(500);
-        res.body(ex.getMessage());
+        res.body(formatError(ex.getMessage()));
     }
 
     private void badRequestExceptionHandler(BadRequestException ex, Request req, Response res) {
         res.status(400);
-        res.body(ex.getMessage());
+        res.body(formatError(ex.getMessage()));
     }
 
     private void unauthorizedException(UnauthorizedException ex, Request req, Response res) {
         res.status(401);
-        res.body(ex.getMessage());
+        res.body(formatError(ex.getMessage()));
     }
 
     private void duplicateEntryExceptionHandler(DuplicateEntryException ex, Request req, Response res) {
         res.status(403);
-        res.body(ex.getMessage());
+        res.body(formatError(ex.getMessage()));
     }
 
     private Object clear(Request req, Response res) throws DataAccessException {
@@ -98,5 +104,13 @@ public class Server {
         return new Gson().toJson(userService.login(logReq));
     }
 
+    private Object logout(Request req, Response res) throws UnauthorizedException, DataAccessException {
+        String authToken = req.headers("authorization");
+        if (authToken == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        userService.logout(new AuthTokenRequest(authToken));
+        return "";
+    }
 
 }
