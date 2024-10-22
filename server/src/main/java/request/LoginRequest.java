@@ -1,4 +1,9 @@
 package request;
 
+/**
+ * Request class for login endpoint.
+ * @param username The username trying to login.
+ * @param password The user's password.
+ */
 public record LoginRequest(String username, String password) {
 }
