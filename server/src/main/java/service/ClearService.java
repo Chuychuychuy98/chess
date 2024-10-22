@@ -29,7 +29,7 @@ public class ClearService {
      * Clear data from all databases.
      * @throws DataAccessException Indicates error reaching the database.
      */
-    void clear() throws DataAccessException{
+    public void clear() throws DataAccessException{
         authDAO.clear();
         gameDAO.clear();
         userDAO.clear();
