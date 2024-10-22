@@ -30,18 +30,24 @@ public class MemoryAuthDAO implements AuthDAO{
     @Override
     public AuthData getAuth(String authToken) throws UnauthorizedException {
         AuthData data =  database.get(authToken);
-        if (data == null) throw new UnauthorizedException("Error: unauthorized");
+        if (data == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
         return data;
     }
 
     @Override
     public void deleteAuth(String authToken) throws UnauthorizedException {
         AuthData data = database.remove(authToken);
-        if (data == null) throw new UnauthorizedException("Error: unauthorized");
+        if (data == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
     }
 
     @Override
     public void checkAuth(String authToken) throws UnauthorizedException {
-        if (database.get(authToken) == null) throw new UnauthorizedException("Error: unauthorized");
+        if (database.get(authToken) == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
     }
 }

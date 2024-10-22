@@ -61,7 +61,9 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece toMove = board.getPiece(startPosition);
-        if (toMove == null) return null;
+        if (toMove == null) {
+            return null;
+        }
         TeamColor color = toMove.getTeamColor();
         Collection<ChessMove> allMoves = toMove.pieceMoves(board, startPosition);
         Collection<ChessMove> validMoves = new HashSet<>();
@@ -135,7 +137,9 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if (isInCheck(teamColor)) return false;
+        if (isInCheck(teamColor)) {
+            return false;
+        }
         return noValidMoves(teamColor);
     }
 

@@ -39,8 +39,12 @@ public class ChessPiece {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ChessPiece that = (ChessPiece) o;
         return pieceColor == that.pieceColor && type == that.type;
     }
@@ -113,21 +117,37 @@ public class ChessPiece {
     private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new HashSet<>();
         ChessPosition newPosition = myPosition.translate(1, 0);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         newPosition = myPosition.translate(1, 1);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         newPosition = myPosition.translate(0, 1);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         newPosition = myPosition.translate(-1, 1);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         newPosition = myPosition.translate(-1, 0);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         newPosition = myPosition.translate(-1, -1);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         newPosition = myPosition.translate(0, -1);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         newPosition = myPosition.translate(1, -1);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         return moves;
     }
 
@@ -151,33 +171,49 @@ public class ChessPiece {
                 newPosition = myPosition.translate(spaces, spaces);
                 if (board.canMoveOrCapture(newPosition, pieceColor)) {
                     moves.add(new ChessMove(myPosition, newPosition, null));
-                    if (board.getPiece(newPosition) != null) continueNE = false;
+                    if (board.getPiece(newPosition) != null) {
+                        continueNE = false;
+                    }
                 }
-                else continueNE = false;
+                else {
+                    continueNE = false;
+                }
             }
             if (continueSE) {
                 newPosition = myPosition.translate(-spaces, spaces);
                 if (board.canMoveOrCapture(newPosition, pieceColor)) {
                     moves.add(new ChessMove(myPosition, newPosition, null));
-                    if (board.getPiece(newPosition) != null) continueSE = false;
+                    if (board.getPiece(newPosition) != null) {
+                        continueSE = false;
+                    }
                 }
-                else continueSE = false;
+                else {
+                    continueSE = false;
+                }
             }
             if (continueNW) {
                 newPosition = myPosition.translate(spaces, -spaces);
                 if (board.canMoveOrCapture(newPosition, pieceColor)) {
                     moves.add(new ChessMove(myPosition, newPosition, null));
-                    if (board.getPiece(newPosition) != null) continueNW = false;
+                    if (board.getPiece(newPosition) != null) {
+                        continueNW = false;
+                    }
                 }
-                else continueNW = false;
+                else {
+                    continueNW = false;
+                }
             }
             if (continueSW) {
                 newPosition = myPosition.translate(-spaces, -spaces);
                 if (board.canMoveOrCapture(newPosition, pieceColor)) {
                     moves.add(new ChessMove(myPosition, newPosition, null));
-                    if (board.getPiece(newPosition) != null) continueSW = false;
+                    if (board.getPiece(newPosition) != null) {
+                        continueSW = false;
+                    }
                 }
-                else continueSW = false;
+                else {
+                    continueSW = false;
+                }
             }
         }
         return moves;
@@ -192,21 +228,37 @@ public class ChessPiece {
     private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new HashSet<>();
         ChessPosition newPosition = myPosition.translate(1, 2);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         newPosition = myPosition.translate(-1, 2);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         newPosition = myPosition.translate(1, -2);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         newPosition = myPosition.translate(-1, -2);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         newPosition = myPosition.translate(2, 1);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         newPosition = myPosition.translate(-2, 1);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         newPosition = myPosition.translate(2, -1);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         newPosition = myPosition.translate(-2, -1);
-        if (board.canMoveOrCapture(newPosition, pieceColor)) moves.add(new ChessMove(myPosition, newPosition, null));
+        if (board.canMoveOrCapture(newPosition, pieceColor)) {
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
         return moves;
     }
 
@@ -237,7 +289,9 @@ public class ChessPiece {
         ChessPosition newPosition = myPosition.translate(up ? spaces : -spaces, 0);
         while (board.canMoveOrCapture(newPosition, pieceColor)) {
             moves.add(new ChessMove(myPosition, newPosition, null));
-            if (board.getPiece(newPosition) != null) break;
+            if (board.getPiece(newPosition) != null) {
+                break;
+            }
             spaces++;
             newPosition = myPosition.translate(up ? spaces : -spaces, 0);
         }
@@ -255,7 +309,9 @@ public class ChessPiece {
         ChessPosition newPosition = myPosition.translate(0, left ? -spaces : spaces);
         while (board.canMoveOrCapture(newPosition, pieceColor)) {
             moves.add(new ChessMove(myPosition, newPosition, null));
-            if (board.getPiece(newPosition) != null) break;
+            if (board.getPiece(newPosition) != null) {
+                break;
+            }
             spaces++;
             newPosition = myPosition.translate(0, left ? -spaces : spaces);
         }
@@ -289,7 +345,9 @@ public class ChessPiece {
         Collection<ChessMove> moves = new HashSet<>();
 
         ChessPosition newPos = curPos.forward(pieceColor);
-        if (!newPos.inBounds()) return moves;
+        if (!newPos.inBounds()) {
+            return moves;
+        }
 
         if (board.getPiece(newPos) == null) {
             addPawnMoveWithPromotions(curPos, newPos, moves);

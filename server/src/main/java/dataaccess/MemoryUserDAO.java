@@ -30,12 +30,16 @@ public class MemoryUserDAO implements UserDAO {
     @Override
     public UserData getUser(String username) throws EntryNotFoundException {
         UserData data = database.get(username);
-        if (data == null) throw new EntryNotFoundException(String.format("No user found with username %s.", username));
+        if (data == null) {
+            throw new EntryNotFoundException(String.format("No user found with username %s.", username));
+        }
         return data;
     }
 
     @Override
     public void removeUser(String username) throws EntryNotFoundException {
-        if (database.remove(username) == null) throw new EntryNotFoundException(String.format("No user found with username %s.", username));
+        if (database.remove(username) == null) {
+            throw new EntryNotFoundException(String.format("No user found with username %s.", username));
+        }
     }
 }

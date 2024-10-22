@@ -61,8 +61,12 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ChessBoard that = (ChessBoard) o;
         return Objects.equals(pieces, that.pieces);
     }
@@ -155,7 +159,9 @@ public class ChessBoard {
      */
     public boolean positionBlockedByEnemy(ChessPosition pos, ChessGame.TeamColor color) {
         ChessPiece piece = getPiece(pos);
-        if (piece == null) return false;
+        if (piece == null) {
+            return false;
+        }
         return piece.getTeamColor() != color;
     }
 
