@@ -33,8 +33,8 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     @Override
-    public void deleteAuth(AuthData authData) throws UnauthorizedException {
-        AuthData data = database.remove(authData.authToken());
+    public void deleteAuth(String authToken) throws UnauthorizedException {
+        AuthData data = database.remove(authToken);
         if (data == null) throw new UnauthorizedException("Error: unauthorized");
     }
 }

@@ -29,11 +29,10 @@ public interface AuthDAO {
 
     /**
      * Delete an authorization so that it is no longer valid.
-     * @param authData The authorization to delete.
-     * @throws EntryNotFoundException Indicates that the given authData is not found in the database.
+     * @param authToken The authorization to delete.
      * @throws UnauthorizedException Indicates that the given authData is not found in the database.
      * @throws DataAccessException Indicates an error reaching the database.
      */
-    void deleteAuth(AuthData authData) throws DataAccessException, UnauthorizedException;
+    void deleteAuth(String authToken) throws DataAccessException, UnauthorizedException;
 
 }
