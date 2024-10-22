@@ -11,6 +11,7 @@ public class ServiceTests {
 
     private ClearService clearService;
     private UserService userService;
+    private GameService gameService;
 
     @BeforeEach
     public void init() {
@@ -20,6 +21,7 @@ public class ServiceTests {
 
         clearService = new ClearService(authDAO, gameDAO, userDAO);
         userService = new UserService(userDAO, authDAO);
+        gameService = new GameService(gameDAO, authDAO);
     }
 
     @Test
@@ -76,5 +78,18 @@ public class ServiceTests {
     @Test
     public void logoutNonExistent() {
         Assertions.assertThrows(UnauthorizedException.class, () -> userService.logout(new AuthTokenRequest("abc")));
+    }
+
+    @Test
+    public void successListEmpty() {
+        Assertions.assertDoesNotThrow(() -> {
+            String authToken = userService.register(new RegisterRequest("myName", "myPass", "email@email.org")).authToken();
+            gameService.list(new AuthTokenRequest(authToken));
+        });
+    }
+
+    @Test
+    public void failList() {
+        Assertions.assertThrows(UnauthorizedException.class, () -> gameService.list(new AuthTokenRequest("abc")));
     }
 }
