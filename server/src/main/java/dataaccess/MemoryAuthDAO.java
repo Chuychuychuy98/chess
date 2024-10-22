@@ -37,4 +37,9 @@ public class MemoryAuthDAO implements AuthDAO{
         AuthData data = database.remove(authToken);
         if (data == null) throw new UnauthorizedException("Error: unauthorized");
     }
+
+    @Override
+    public void checkAuth(String authToken) throws UnauthorizedException {
+        if (database.get(authToken) == null) throw new UnauthorizedException("Error: unauthorized");
+    }
 }

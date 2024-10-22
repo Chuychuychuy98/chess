@@ -35,4 +35,11 @@ public interface AuthDAO {
      */
     void deleteAuth(String authToken) throws DataAccessException, UnauthorizedException;
 
+    /**
+     * Throw an exception if the given authToken is not found.
+     * @param authToken The authToken to check
+     * @throws UnauthorizedException Indicates that the given authData is not found in the database.
+     * @throws DataAccessException Indicates an error reaching the database.
+     */
+    void checkAuth(String authToken) throws DataAccessException, UnauthorizedException;
 }
