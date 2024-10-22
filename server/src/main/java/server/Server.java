@@ -5,6 +5,8 @@ import dataaccess.*;
 import exceptions.BadRequestException;
 import exceptions.DuplicateEntryException;
 import exceptions.EntryNotFoundException;
+import exceptions.UnauthorizedException;
+import request.LoginRequest;
 import request.RegisterRequest;
 import service.ClearService;
 import service.GameService;
@@ -35,11 +37,13 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
+        Spark.post("/session", this::login);
 
         Spark.exception(DataAccessException.class, this::otherExceptionHandler);
         Spark.exception(EntryNotFoundException.class, this::otherExceptionHandler);
         Spark.exception(DuplicateEntryException.class, this::duplicateEntryExceptionHandler);
         Spark.exception(BadRequestException.class, this::badRequestExceptionHandler);
+        Spark.exception(UnauthorizedException.class, this::unauthorizedException);
         //This line initializes the server and can be removed once you have a functioning endpoint
         Spark.init();
 
@@ -62,6 +66,11 @@ public class Server {
         res.body(ex.getMessage());
     }
 
+    private void unauthorizedException(UnauthorizedException ex, Request req, Response res) {
+        res.status(401);
+        res.body(ex.getMessage());
+    }
+
     private void duplicateEntryExceptionHandler(DuplicateEntryException ex, Request req, Response res) {
         res.status(403);
         res.body(ex.getMessage());
@@ -80,4 +89,14 @@ public class Server {
         }
         return new Gson().toJson(userService.register(regReq));
     }
+
+    private Object login(Request req, Response res) throws BadRequestException, UnauthorizedException, DuplicateEntryException, DataAccessException {
+        LoginRequest logReq = new Gson().fromJson(req.body(), LoginRequest.class);
+        if (logReq.username() == null || logReq.password() == null) {
+            throw new BadRequestException("Error: bad request");
+        }
+        return new Gson().toJson(userService.login(logReq));
+    }
+
+
 }
