@@ -20,6 +20,15 @@ public class ChessGame {
     }
 
     /**
+     * Update the elements of this game to match a given new game.
+     * @param newGame The game whose elements this game will copy.
+     */
+    public void updateGame(ChessGame newGame) {
+        this.turn = newGame.turn;
+        this.board = newGame.board;
+    }
+
+    /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
