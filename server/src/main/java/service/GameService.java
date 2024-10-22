@@ -45,14 +45,15 @@ public class GameService {
 
     /**
      * Create a new chess game and add it to the database.
-     * @param request Request containing the authToken to validate and the name of the new game.
+     * @param request Request containing the name of the new game.
+     * @param authTokenRequest Request containing the authToken to validate.
      * @return CreateGameResult containing the new game's ID.
      * @throws DataAccessException Indicates an error reaching the database.
      * @throws UnauthorizedException Indicates that the given authToken was not found in the database.
      * @throws DuplicateEntryException Indicates that the gameID was not unique.
      */
-    public CreateGameResult create(CreateGameRequest request) throws DataAccessException, UnauthorizedException, DuplicateEntryException {
-        authDAO.checkAuth(request.authToken());
+    public CreateGameResult create(CreateGameRequest request, AuthTokenRequest authTokenRequest) throws DataAccessException, UnauthorizedException, DuplicateEntryException {
+        authDAO.checkAuth(authTokenRequest.authToken());
         GameData newGame = new GameData(null, null, request.gameName(), new ChessGame());
         gameDAO.createGame(newGame);
         return new CreateGameResult(newGame.gameID());
@@ -60,14 +61,15 @@ public class GameService {
 
     /**
      * Add a player to a game.
-     * @param request JoinRequest containing the authToken to validate, the gameID to join, and the color to join as.
+     * @param request JoinRequest containing the gameID to join and the color to join as.
+     * @param authTokenRequest AuthTokenRequest containing the authToken to validate.
      * @throws DataAccessException Indicates an error reaching the database.
      * @throws UnauthorizedException Indicates that the authToken is not found in the database.
      * @throws TeamColorTakenException Indicates that the requested color is not available for the requested game.
      * @throws EntryNotFoundException Indicates that the gameID is not found in the database.
      */
-    public void join(JoinRequest request) throws DataAccessException, UnauthorizedException, TeamColorTakenException, EntryNotFoundException {
-        AuthData auth = authDAO.getAuth(request.authToken());
+    public void join(JoinRequest request, AuthTokenRequest authTokenRequest) throws DataAccessException, UnauthorizedException, TeamColorTakenException, EntryNotFoundException {
+        AuthData auth = authDAO.getAuth(authTokenRequest.authToken());
         GameData game = gameDAO.getGame(request.gameID());
         if ((request.color() == ChessGame.TeamColor.BLACK && game.blackUsername() != null) ||
             (request.color() == ChessGame.TeamColor.WHITE && game.whiteUsername() != null)) {
