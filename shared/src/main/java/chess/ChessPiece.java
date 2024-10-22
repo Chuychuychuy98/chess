@@ -25,10 +25,6 @@ public class ChessPiece {
         this.moved = moved;
     }
 
-    public boolean hasMoved() {
-        return moved;
-    }
-
     public ChessPiece movedCopy() {
         return new ChessPiece(pieceColor, type, moved);
     }

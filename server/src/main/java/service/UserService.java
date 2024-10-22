@@ -34,9 +34,11 @@ public class UserService {
      * Register a new user.
      * @param request The request containing the username, password, and email to register.
      * @return AuthTokenResult containing the new authToken and the username associated with it.
-     * @throws DuplicateEntryException Indicates that the username was already taken or that the random authToken was not unique.
+     * @throws DuplicateEntryException Indicates that the username was already taken or
+     * that the random authToken was not unique.
      * @throws DataAccessException Indicates an error reaching the database.
-     * @throws EntryNotFoundException Indicates that the user was added, but adding the authToken failed, then the user could not be found when trying to remove it.
+     * @throws EntryNotFoundException Indicates that the user was added, but adding the authToken failed,
+     * then the user could not be found when trying to remove it.
      */
     public AuthTokenResult register(RegisterRequest request) throws DuplicateEntryException, DataAccessException, EntryNotFoundException {
         UserData newUser = new UserData(request.username(), request.password(), request.email());

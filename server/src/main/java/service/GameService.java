@@ -52,7 +52,8 @@ public class GameService {
      * @throws UnauthorizedException Indicates that the given authToken was not found in the database.
      * @throws DuplicateEntryException Indicates that the gameID was not unique.
      */
-    public CreateGameResult create(CreateGameRequest request, AuthTokenRequest authTokenRequest) throws DataAccessException, UnauthorizedException, DuplicateEntryException {
+    public CreateGameResult create(CreateGameRequest request, AuthTokenRequest authTokenRequest)
+            throws DataAccessException, UnauthorizedException, DuplicateEntryException {
         authDAO.checkAuth(authTokenRequest.authToken());
         GameData newGame = new GameData(null, null, request.gameName(), new ChessGame());
         gameDAO.createGame(newGame);
@@ -68,7 +69,8 @@ public class GameService {
      * @throws TeamColorTakenException Indicates that the requested playerColor is not available for the requested game.
      * @throws EntryNotFoundException Indicates that the gameID is not found in the database.
      */
-    public void join(JoinRequest request, AuthTokenRequest authTokenRequest) throws DataAccessException, UnauthorizedException, TeamColorTakenException, EntryNotFoundException {
+    public void join(JoinRequest request, AuthTokenRequest authTokenRequest)
+            throws DataAccessException, UnauthorizedException, TeamColorTakenException, EntryNotFoundException {
         AuthData auth = authDAO.getAuth(authTokenRequest.authToken());
         GameData game = gameDAO.getGame(request.gameID());
         if ((request.playerColor() == ChessGame.TeamColor.BLACK && game.blackUsername() != null) ||

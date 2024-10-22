@@ -87,7 +87,8 @@ public class Server {
         return "";
     }
 
-    private Object register(Request req, Response res) throws DataAccessException, EntryNotFoundException, DuplicateEntryException, BadRequestException {
+    private Object register(Request req, Response res)
+            throws DataAccessException, EntryNotFoundException, DuplicateEntryException, BadRequestException {
         RegisterRequest regReq = new Gson().fromJson(req.body(), RegisterRequest.class);
         if (regReq.username() == null || regReq.password() == null || regReq.email() == null) {
             throw new BadRequestException("Error: bad request");
@@ -95,7 +96,8 @@ public class Server {
         return new Gson().toJson(userService.register(regReq));
     }
 
-    private Object login(Request req, Response res) throws BadRequestException, UnauthorizedException, DuplicateEntryException, DataAccessException {
+    private Object login(Request req, Response res)
+            throws BadRequestException, UnauthorizedException, DuplicateEntryException, DataAccessException {
         LoginRequest logReq = new Gson().fromJson(req.body(), LoginRequest.class);
         if (logReq.username() == null || logReq.password() == null) {
             throw new BadRequestException("Error: bad request");
@@ -116,7 +118,8 @@ public class Server {
         return new Gson().toJson(gameService.list(new AuthTokenRequest(authToken)));
     }
 
-    private Object create(Request req, Response res) throws UnauthorizedException, DuplicateEntryException, DataAccessException, BadRequestException {
+    private Object create(Request req, Response res)
+            throws UnauthorizedException, DuplicateEntryException, DataAccessException, BadRequestException {
         String authToken = req.headers("authorization");
         checkAuthToken(authToken);
         CreateGameRequest createGameRequest = new Gson().fromJson(req.body(), CreateGameRequest.class);
@@ -126,7 +129,8 @@ public class Server {
         return new Gson().toJson(gameService.create(createGameRequest, new AuthTokenRequest(authToken)));
     }
 
-    private Object join(Request req, Response res) throws BadRequestException, UnauthorizedException, TeamColorTakenException, DataAccessException {
+    private Object join(Request req, Response res)
+            throws BadRequestException, UnauthorizedException, TeamColorTakenException, DataAccessException {
         String authToken = req.headers("authorization");
         checkAuthToken(authToken);
         JoinRequest joinRequest = new Gson().fromJson(req.body(), JoinRequest.class);

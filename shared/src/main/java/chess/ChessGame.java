@@ -70,7 +70,9 @@ public class ChessGame {
         ChessBoard simBoard = board.copyOf();
         for (ChessMove move : allMoves) {
             simBoard.simMove(move);
-            if (!simBoard.isInCheck(color)) validMoves.add(move);
+            if (!simBoard.isInCheck(color)) {
+                validMoves.add(move);
+            }
             simBoard.copyBoard(board);
         }
         return validMoves;
@@ -115,7 +117,9 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (!isInCheck(teamColor)) return false;
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
         return noValidMoves(teamColor);
     }
 
