@@ -36,9 +36,9 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public void updateGame(int gameID, ChessGame game) throws EntryNotFoundException {
+    public void updateGame(int gameID, ChessGame.TeamColor color, String newUsername) throws EntryNotFoundException {
         GameData data = database.get(gameID);
         if (data == null) throw new EntryNotFoundException(String.format("Game with id %d not found.", gameID));
-        data.game().updateGame(game);
+        database.put(data.gameID(), data.newPlayer(color, newUsername));
     }
 }

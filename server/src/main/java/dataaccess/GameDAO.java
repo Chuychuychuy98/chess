@@ -36,12 +36,13 @@ public interface GameDAO {
     GameData[] listGames() throws DataAccessException;
 
     /**
-     * Replace the chess game with the given gameID with the provided game.
-     * @param gameID The ID of the game being replaced.
-     * @param game The game which will replace the old one.
+     * Update the game with the given ID so that its player of the given color now has the new username.
+     * @param gameID The ID of the game being updated.
+     * @param color The color of the player being replaced.
+     * @param newUsername The new username associated with the given color.
      * @throws EntryNotFoundException Indicates the given gameID is not found in the database.
      * @throws DataAccessException Indicates an error reaching the database.
      */
-    void updateGame(int gameID, ChessGame game) throws DataAccessException, EntryNotFoundException;
+    void updateGame(int gameID, ChessGame.TeamColor color, String newUsername) throws DataAccessException, EntryNotFoundException;
 
 }
