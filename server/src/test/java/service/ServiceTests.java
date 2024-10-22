@@ -14,11 +14,15 @@ public class ServiceTests {
     private UserService userService;
     private GameService gameService;
 
+    private AuthDAO authDAO;
+    private GameDAO gameDAO;
+    private UserDAO userDAO;
+
     @BeforeEach
     public void init() {
-        AuthDAO authDAO = new MemoryAuthDAO();
-        GameDAO gameDAO = new MemoryGameDAO();
-        UserDAO userDAO = new MemoryUserDAO();
+        authDAO = new MemoryAuthDAO();
+        gameDAO = new MemoryGameDAO();
+        userDAO = new MemoryUserDAO();
 
         clearService = new ClearService(authDAO, gameDAO, userDAO);
         userService = new UserService(userDAO, authDAO);
