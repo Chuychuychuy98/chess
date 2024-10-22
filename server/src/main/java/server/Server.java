@@ -40,6 +40,7 @@ public class Server {
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
+        Spark.get("/game", this::list);
 
         Spark.exception(DataAccessException.class, this::otherExceptionHandler);
         Spark.exception(EntryNotFoundException.class, this::otherExceptionHandler);
@@ -111,6 +112,14 @@ public class Server {
         }
         userService.logout(new AuthTokenRequest(authToken));
         return "";
+    }
+
+    private Object list(Request req, Response res) throws UnauthorizedException, DataAccessException {
+        String authToken = req.headers("authorization");
+        if (authToken == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        return new Gson().toJson(gameService.list(new AuthTokenRequest(authToken)));
     }
 
 }
