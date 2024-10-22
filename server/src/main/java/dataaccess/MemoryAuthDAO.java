@@ -20,21 +20,21 @@ public class MemoryAuthDAO implements AuthDAO{
     @Override
     public void createAuth(AuthData authData) throws DuplicateEntryException {
         if (database.containsKey(authData.authToken())) {
-            throw new DuplicateEntryException("That authToken is already in use.");
+            throw new DuplicateEntryException("Error: authToken already in use");
         }
         database.put(authData.authToken(), authData);
     }
 
     @Override
-    public AuthData getAuth(String authToken) throws EntryNotFoundException {
+    public AuthData getAuth(String authToken) throws UnauthorizedException {
         AuthData data =  database.get(authToken);
-        if (data == null) throw new EntryNotFoundException("User is not authorized.");
+        if (data == null) throw new UnauthorizedException("Error: unauthorized");
         return data;
     }
 
     @Override
-    public void deleteAuth(AuthData authData) throws EntryNotFoundException {
+    public void deleteAuth(AuthData authData) throws UnauthorizedException {
         AuthData data = database.remove(authData.authToken());
-        if (data == null) throw new EntryNotFoundException("User is not authorized.");
+        if (data == null) throw new UnauthorizedException("Error: unauthorized");
     }
 }

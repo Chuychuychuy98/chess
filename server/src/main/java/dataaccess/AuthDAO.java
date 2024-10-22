@@ -25,7 +25,7 @@ public interface AuthDAO {
      * @throws EntryNotFoundException Indicates that the given authToken is not found in the database.
      * @throws DataAccessException Indicates an error reaching the database.
      */
-    AuthData getAuth(String authToken) throws DataAccessException, EntryNotFoundException;
+    AuthData getAuth(String authToken) throws DataAccessException, UnauthorizedException;
 
     /**
      * Delete an authorization so that it is no longer valid.
@@ -33,6 +33,6 @@ public interface AuthDAO {
      * @throws EntryNotFoundException Indicates that the given authData is not found in the database.
      * @throws DataAccessException Indicates an error reaching the database.
      */
-    void deleteAuth(AuthData authData) throws DataAccessException, EntryNotFoundException;
+    void deleteAuth(AuthData authData) throws DataAccessException, UnauthorizedException;
 
 }
