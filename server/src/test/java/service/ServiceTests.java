@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.*;
 import org.junit.jupiter.api.*;
+import request.CreateGameRequest;
 import request.LoginRequest;
 import request.AuthTokenRequest;
 import request.RegisterRequest;
@@ -89,7 +90,31 @@ public class ServiceTests {
     }
 
     @Test
+    public void successListWithGames() {
+        Assertions.assertDoesNotThrow(() -> {
+            String authToken = userService.register(new RegisterRequest("myName", "myPass", "email@email.org")).authToken();
+            gameService.create(new CreateGameRequest(authToken, "game1"));
+            gameService.create(new CreateGameRequest(authToken, "game2"));
+            gameService.list(new AuthTokenRequest(authToken));
+        });
+    }
+
+    @Test
     public void failList() {
         Assertions.assertThrows(UnauthorizedException.class, () -> gameService.list(new AuthTokenRequest("abc")));
+    }
+
+    @Test
+    public void successCreateGame() {
+        Assertions.assertDoesNotThrow(() -> {
+            String authToken = userService.register(new RegisterRequest("myName", "myPass", "email@email.org")).authToken();
+            gameService.create(new CreateGameRequest(authToken, "game"));
+        });
+    }
+
+    @Test
+    public void createGameUnauthorized() {
+        Assertions.assertThrows(UnauthorizedException.class, () ->
+                gameService.create(new CreateGameRequest("abc", "game")));
     }
 }
