@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.*;
 import org.junit.jupiter.api.*;
+import request.LoginRequest;
 import request.RegisterRequest;
 
 
@@ -36,6 +37,30 @@ public class ServiceTests {
         Assertions.assertThrows(DuplicateEntryException.class, () -> {
             userService.register(new RegisterRequest("myName", "myPass", "email@email.org"));
             userService.register(new RegisterRequest("myName", "myPass", "email@email.org"));
+        });
+    }
+
+    @Test
+    public void successLogin() {
+        Assertions.assertDoesNotThrow(() -> {
+            userService.register(new RegisterRequest("myName", "myPass", "email@email.org"));
+            userService.login(new LoginRequest("myName", "myPass"));
+        });
+    }
+
+    @Test
+    public void loginUserDoesNotExist() {
+        Assertions.assertThrows(UnauthorizedException.class, () -> {
+            userService.register(new RegisterRequest("myName", "myPass", "email@email.org"));
+            userService.login(new LoginRequest("fakename", "myPass"));
+        });
+    }
+
+    @Test
+    public void loginPasswordDoesNotMatch() {
+        Assertions.assertThrows(UnauthorizedException.class, () -> {
+            userService.register(new RegisterRequest("myName", "myPass", "email@email.org"));
+            userService.login(new LoginRequest("myName", "wrongPass"));
         });
     }
 }
