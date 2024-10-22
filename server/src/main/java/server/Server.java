@@ -2,13 +2,8 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.*;
-import exceptions.BadRequestException;
-import exceptions.DuplicateEntryException;
-import exceptions.EntryNotFoundException;
-import exceptions.UnauthorizedException;
-import request.AuthTokenRequest;
-import request.LoginRequest;
-import request.RegisterRequest;
+import exceptions.*;
+import request.*;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -44,7 +39,8 @@ public class Server {
 
         Spark.exception(DataAccessException.class, this::otherExceptionHandler);
         Spark.exception(EntryNotFoundException.class, this::otherExceptionHandler);
-        Spark.exception(DuplicateEntryException.class, this::duplicateEntryExceptionHandler);
+        Spark.exception(DuplicateEntryException.class, this::duplicateExceptionHandler);
+        Spark.exception(TeamColorTakenException.class, this::duplicateExceptionHandler);
         Spark.exception(BadRequestException.class, this::badRequestExceptionHandler);
         Spark.exception(UnauthorizedException.class, this::unauthorizedException);
         //This line initializes the server and can be removed once you have a functioning endpoint
@@ -78,7 +74,7 @@ public class Server {
         res.body(formatError(ex.getMessage()));
     }
 
-    private void duplicateEntryExceptionHandler(DuplicateEntryException ex, Request req, Response res) {
+    private void duplicateExceptionHandler(Exception ex, Request req, Response res) {
         res.status(403);
         res.body(formatError(ex.getMessage()));
     }
