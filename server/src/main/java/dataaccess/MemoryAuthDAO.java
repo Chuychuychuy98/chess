@@ -2,15 +2,15 @@ package dataaccess;
 
 import model.AuthData;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Memory implementation of AuthDAO
  */
 public class MemoryAuthDAO implements AuthDAO{
 
-    Set<AuthData> database = new HashSet<>();
+    Map<String, AuthData> database = new HashMap<>();
 
     @Override
     public void clear() {
@@ -18,17 +18,23 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     @Override
-    public void createAuth(AuthData authData) {
-
+    public void createAuth(AuthData authData) throws DuplicateEntryException {
+        if (database.containsKey(authData.authToken())) {
+            throw new DuplicateEntryException("That authToken is already in use.");
+        }
+        database.put(authData.authToken(), authData);
     }
 
     @Override
     public AuthData getAuth(String authToken) throws EntryNotFoundException {
-        return null;
+        AuthData data =  database.get(authToken);
+        if (data == null) throw new EntryNotFoundException("User is not authorized.");
+        return data;
     }
 
     @Override
     public void deleteAuth(AuthData authData) throws EntryNotFoundException {
-
+        AuthData data = database.remove(authData.authToken());
+        if (data == null) throw new EntryNotFoundException("User is not authorized.");
     }
 }
