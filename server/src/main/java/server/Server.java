@@ -107,18 +107,14 @@ public class Server {
 
     private Object logout(Request req, Response res) throws UnauthorizedException, DataAccessException {
         String authToken = req.headers("authorization");
-        if (authToken == null) {
-            throw new UnauthorizedException("Error: unauthorized");
-        }
+        checkAuthToken(authToken);
         userService.logout(new AuthTokenRequest(authToken));
         return "";
     }
 
     private Object list(Request req, Response res) throws UnauthorizedException, DataAccessException {
         String authToken = req.headers("authorization");
-        if (authToken == null) {
-            throw new UnauthorizedException("Error: unauthorized");
-        }
+        checkAuthToken(authToken);
         return new Gson().toJson(gameService.list(new AuthTokenRequest(authToken)));
     }
 
