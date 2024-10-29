@@ -15,10 +15,40 @@ public class Server {
     private final GameService gameService;
     private final UserService userService;
 
-    public Server() {
+    String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS auth (
+              authtoken CHAR(36) NOT NULL,
+              username VARCHAR(256) NOT NULL,
+              PRIMARY KEY (authtoken)
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS game (
+              gameID int NOT NULL,
+              whiteUsername VARCHAR(256),
+              blackUsername VARCHAR(256),
+              gameName VARCHAR(256) NOT NULL,
+              game VARCHAR(256) NOT NULL,
+              PRIMARY KEY (gameID)
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS user (
+              username VARCHAR(256) NOT NULL,
+              password VARCHAR(256) NOT NULL,
+              email VARCHAR(256) NOT NULL,
+              PRIMARY KEY (username)
+            )
+            """
+    };
+
+    public Server() throws DataAccessException {
+        DatabaseManager.configureDatabase(createStatements);
         AuthDAO authDAO = new DatabaseAuthDAO();
         GameDAO gameDAO = new DatabaseGameDAO();
         UserDAO userDAO = new DatabaseUserDAO();
+
 
         clearService = new ClearService(authDAO, gameDAO, userDAO);
         gameService = new GameService(gameDAO, authDAO);
