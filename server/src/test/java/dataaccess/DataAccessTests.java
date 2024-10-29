@@ -99,4 +99,17 @@ public class DataAccessTests {
     public void deleteNonexistentAuth() {
         Assertions.assertThrows(UnauthorizedException.class, () -> authDAO.deleteAuth("nonexistent"));
     }
+
+    @Test
+    public void checkAuthSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            authDAO.createAuth(new AuthData("abc", "user"));
+            authDAO.checkAuth("abc");
+        });
+    }
+
+    @Test
+    public void checkAuthFailure() {
+        Assertions.assertThrows(UnauthorizedException.class, () -> authDAO.checkAuth("nonexistent"));
+    }
 }
