@@ -41,13 +41,24 @@ public class DatabaseAuthDAO implements AuthDAO {
             }
         }
         catch (SQLException ex) {
-            throw new DataAccessException("Error: could not connect to database");
+            throw new DataAccessException(String.format("Error: %s", ex.getMessage()));
         }
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException, UnauthorizedException {
-        return null;
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT authtoken, username FROM auth WHERE authtoken=?")) {
+                ps.setString(1, authToken);
+                ResultSet rs = ps.executeQuery();
+                if (!rs.next()) {
+                    throw new UnauthorizedException("Error: unauthorized");
+                }
+                return new AuthData(rs.getString("authtoken"), rs.getString("username"));
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Error: %s", ex.getMessage()));
+        }
     }
 
     @Override
