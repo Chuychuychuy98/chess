@@ -165,4 +165,15 @@ public class DataAccessTests {
         Assertions.assertThrows(EntryNotFoundException.class, () -> userDAO.getUser("user"));
         Assertions.assertThrows(EntryNotFoundException.class, () -> userDAO.getUser("user2"));
     }
+
+    @Test
+    public void deleteUserSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            userDAO.createUser(new UserData("user", "pass", "email@email.com"));
+            userDAO.createUser(new UserData("user2", "pass2", "email2@email.com"));
+            userDAO.removeUser("user");
+            userDAO.getUser("user2");
+        });
+        Assertions.assertThrows(EntryNotFoundException.class, () -> userDAO.getUser("user"));
+    }
 }
