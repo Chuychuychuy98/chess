@@ -122,11 +122,12 @@ public class DataAccessTests {
             userDAO.createUser(data);
             try (Connection conn = DatabaseManager.getConnection()) {
                 try (PreparedStatement ps = conn.prepareStatement("SELECT username, password, email FROM user WHERE username=?")) {
+                    ps.setString(1, "myname");
                     ResultSet rs = ps.executeQuery();
                     Assertions.assertTrue(rs.next());
                     Assertions.assertEquals(data,
                             new UserData(rs.getString("username"),
-                                    BCrypt.hashpw(rs.getString("password"), BCrypt.gensalt()),
+                                    rs.getString("password"),
                                     rs.getString("email")));
                 }
             }
