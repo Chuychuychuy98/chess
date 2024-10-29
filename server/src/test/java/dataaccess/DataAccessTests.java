@@ -4,10 +4,12 @@ import exceptions.DuplicateEntryException;
 import exceptions.EntryNotFoundException;
 import exceptions.UnauthorizedException;
 import model.AuthData;
+import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -111,5 +113,30 @@ public class DataAccessTests {
     @Test
     public void checkAuthFailure() {
         Assertions.assertThrows(UnauthorizedException.class, () -> authDAO.checkAuth("nonexistent"));
+    }
+
+    @Test
+    public void createUserSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            UserData data = new UserData("myname", "mypass", "email@email.com");
+            userDAO.createUser(data);
+            try (Connection conn = DatabaseManager.getConnection()) {
+                try (PreparedStatement ps = conn.prepareStatement("SELECT username, password, email FROM user WHERE username=?")) {
+                    ResultSet rs = ps.executeQuery();
+                    Assertions.assertTrue(rs.next());
+                    Assertions.assertEquals(data,
+                            new UserData(rs.getString("username"),
+                                    BCrypt.hashpw(rs.getString("password"), BCrypt.gensalt()),
+                                    rs.getString("email")));
+                }
+            }
+        });
+    }
+
+    @Test
+    public void createUserDuplicate() {
+        UserData data = new UserData("user", "pass", "email@email.com");
+        Assertions.assertDoesNotThrow(() -> userDAO.createUser(data));
+        Assertions.assertThrows(DuplicateEntryException.class, () -> userDAO.createUser(data));
     }
 }
