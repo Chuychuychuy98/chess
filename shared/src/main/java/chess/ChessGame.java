@@ -12,11 +12,17 @@ import java.util.Map;
  */
 public class ChessGame {
 
-    private TeamColor turn = TeamColor.WHITE;
-    private ChessBoard board = ChessBoard.defaultBoard();
+    private TeamColor turn;
+    private ChessBoard board;
 
     public ChessGame() {
+        turn = TeamColor.WHITE;
+        this.board = ChessBoard.defaultBoard();
+    }
 
+    public ChessGame(TeamColor turn, ChessBoard board) {
+        this.turn = turn;
+        this.board = board;
     }
 
     /**

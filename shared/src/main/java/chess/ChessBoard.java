@@ -11,10 +11,14 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private final Map<ChessPosition, ChessPiece> pieces = new HashMap<>();
+    private final Map<ChessPosition, ChessPiece> pieces;
 
     public ChessBoard() {
+        pieces = new HashMap<>();
+    }
 
+    public ChessBoard(Map<ChessPosition, ChessPiece> pieces) {
+        this.pieces = pieces;
     }
 
     public static ChessBoard defaultBoard() {
