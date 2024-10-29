@@ -1,6 +1,8 @@
 package dataaccess;
 
 import exceptions.DuplicateEntryException;
+import exceptions.EntryNotFoundException;
+import exceptions.UnauthorizedException;
 import model.AuthData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -68,5 +70,19 @@ public class DataAccessTests {
                 Assertions.assertFalse(rs.next());
             }
         }
+    }
+
+    @Test
+    public void getAuthSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            AuthData testAuth = new AuthData("abc", "user");
+            authDAO.createAuth(testAuth);
+            Assertions.assertEquals(testAuth, authDAO.getAuth("abc"));
+        });
+    }
+
+    @Test
+    public void getAuthFailure() {
+        Assertions.assertThrows(UnauthorizedException.class, () -> authDAO.getAuth("nonexistent"));
     }
 }
