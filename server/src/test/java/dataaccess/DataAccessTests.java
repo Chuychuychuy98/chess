@@ -140,4 +140,18 @@ public class DataAccessTests {
         Assertions.assertDoesNotThrow(() -> userDAO.createUser(data));
         Assertions.assertThrows(DuplicateEntryException.class, () -> userDAO.createUser(data));
     }
+
+    @Test
+    public void getUserSuccess() {
+        UserData data = new UserData("user", "pass", "email@email.com");
+        Assertions.assertDoesNotThrow(() -> {
+            userDAO.createUser(data);
+            Assertions.assertEquals(data, userDAO.getUser("user"));
+        });
+    }
+
+    @Test
+    public void getUserNonexistent() {
+        Assertions.assertThrows(EntryNotFoundException.class, () -> userDAO.getUser("nobody"));
+    }
 }
