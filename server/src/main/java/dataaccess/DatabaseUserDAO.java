@@ -2,6 +2,8 @@ package dataaccess;
 
 import exceptions.DuplicateEntryException;
 import exceptions.EntryNotFoundException;
+import exceptions.UnauthorizedException;
+import model.AuthData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -42,7 +44,18 @@ public class DatabaseUserDAO implements UserDAO {
 
     @Override
     public UserData getUser(String username) throws DataAccessException, EntryNotFoundException {
-        return null;
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT username, password, email FROM user WHERE username=?")) {
+                ps.setString(1, username);
+                ResultSet rs = ps.executeQuery();
+                if (!rs.next()) {
+                    throw new EntryNotFoundException(String.format("No user found with username %s.", username));
+                }
+                return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Error: %s", ex.getMessage()));
+        }
     }
 
     @Override
