@@ -63,7 +63,21 @@ public class DatabaseAuthDAO implements AuthDAO {
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException, UnauthorizedException {
-
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT authtoken FROM auth WHERE authtoken=?")) {
+                ps.setString(1, authToken);
+                ResultSet rs = ps.executeQuery();
+                if (!rs.next()) {
+                    throw new UnauthorizedException("Error: unauthorized");
+                }
+            }
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM auth WHERE authtoken=?")) {
+                ps.setString(1, authToken);
+                ps.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Error: %s", ex.getMessage()));
+        }
     }
 
     @Override
