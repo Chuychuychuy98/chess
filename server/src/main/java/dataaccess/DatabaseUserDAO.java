@@ -67,6 +67,20 @@ public class DatabaseUserDAO implements UserDAO {
 
     @Override
     public void removeUser(String username) throws DataAccessException, EntryNotFoundException {
-
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT username FROM user WHERE username=?")) {
+                ps.setString(1, username);
+                ResultSet rs = ps.executeQuery();
+                if (!rs.next()) {
+                    throw new EntryNotFoundException(String.format("No user found with username %s.", username));
+                }
+            }
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM user WHERE username=?")) {
+                ps.setString(1, username);
+                ps.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Error: %s", ex.getMessage()));
+        }
     }
 }
