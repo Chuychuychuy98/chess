@@ -15,7 +15,14 @@ import java.sql.SQLException;
 public class DatabaseUserDAO implements UserDAO {
     @Override
     public void clear() throws DataAccessException {
-
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("TRUNCATE TABLE user")) {
+                ps.executeUpdate();
+            }
+        }
+        catch (SQLException ex) {
+            throw new DataAccessException("Error: could not connect to database");
+        }
     }
 
     @Override
