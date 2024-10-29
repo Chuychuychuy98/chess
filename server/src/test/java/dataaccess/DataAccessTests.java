@@ -85,4 +85,18 @@ public class DataAccessTests {
     public void getAuthFailure() {
         Assertions.assertThrows(UnauthorizedException.class, () -> authDAO.getAuth("nonexistent"));
     }
+
+    @Test
+    public void deleteAuthSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            authDAO.createAuth(new AuthData("abc", "user"));
+            authDAO.deleteAuth("abc");
+            Assertions.assertThrows(UnauthorizedException.class, () -> authDAO.getAuth("abc"));
+        });
+    }
+
+    @Test
+    public void deleteNonexistentAuth() {
+        Assertions.assertThrows(UnauthorizedException.class, () -> authDAO.deleteAuth("nonexistent"));
+    }
 }
