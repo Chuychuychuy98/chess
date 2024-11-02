@@ -97,6 +97,30 @@ public class DatabaseGameDAO implements GameDAO {
 
     @Override
     public void updateGame(int gameID, ChessGame.TeamColor color, String newUsername) throws DataAccessException, EntryNotFoundException {
-
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?")) {
+                ps.setInt(1, gameID);
+                ResultSet rs = ps.executeQuery();
+                if (!rs.next()) {
+                    throw new EntryNotFoundException(String.format("Game with ID %d not found.", gameID));
+                }
+                if (color == ChessGame.TeamColor.BLACK) {
+                    try (PreparedStatement update = conn.prepareStatement("UPDATE game SET blackUsername=? WHERE gameID=?")) {
+                        update.setString(1, newUsername);
+                        update.setInt(2, gameID);
+                        update.executeUpdate();
+                    }
+                }
+                else {
+                    try (PreparedStatement update = conn.prepareStatement("UPDATE game SET whiteUsername=? WHERE gameID=?")) {
+                        update.setString(1, newUsername);
+                        update.setInt(2, gameID);
+                        update.executeUpdate();
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Error: %s", ex.getMessage()));
+        }
     }
 }
