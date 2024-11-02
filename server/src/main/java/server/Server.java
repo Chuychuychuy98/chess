@@ -43,8 +43,12 @@ public class Server {
             """
     };
 
-    public Server() throws DataAccessException {
-        DatabaseManager.configureDatabase(createStatements);
+    public Server() {
+        try {
+            DatabaseManager.configureDatabase(createStatements);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         AuthDAO authDAO = new DatabaseAuthDAO();
         GameDAO gameDAO = new DatabaseGameDAO();
         UserDAO userDAO = new DatabaseUserDAO();
