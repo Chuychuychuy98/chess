@@ -208,4 +208,18 @@ public class DataAccessTests {
             gameDAO.createGame(new GameData(1, "white", "black", "name", new ChessGame()));
         });
     }
+
+    @Test
+    public void clearGame() throws DataAccessException, SQLException {
+        Assertions.assertDoesNotThrow(() -> {
+            gameDAO.createGame(new GameData(1, "white", "black", "name", new ChessGame()));
+            gameDAO.clear();
+        });
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT gameID FROM game")) {
+                ResultSet rs = ps.executeQuery();
+                Assertions.assertFalse(rs.next());
+            }
+        }
+    }
 }
