@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class DatabaseGameDAO implements GameDAO {
     @Override
@@ -74,7 +75,24 @@ public class DatabaseGameDAO implements GameDAO {
 
     @Override
     public GameData[] listGames() throws DataAccessException {
-        return new GameData[0];
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game")) {
+                ResultSet rs = ps.executeQuery();
+                ArrayList<GameData> games = new ArrayList<>();
+                while (rs.next()) {
+                    games.add(new GameData(
+                            rs.getInt("gameID"),
+                            rs.getString("whiteUsername"),
+                            rs.getString("blackUsername"),
+                            rs.getString("gameName"),
+                            rs.getString("game")
+                    ));
+                }
+                return games.toArray(new GameData[0]);
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Error: %s", ex.getMessage()));
+        }
     }
 
     @Override
