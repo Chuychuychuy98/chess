@@ -3,6 +3,8 @@ package dataaccess;
 import chess.ChessGame;
 import exceptions.DuplicateEntryException;
 import exceptions.EntryNotFoundException;
+import exceptions.UnauthorizedException;
+import model.AuthData;
 import model.GameData;
 
 import java.sql.Connection;
@@ -52,7 +54,22 @@ public class DatabaseGameDAO implements GameDAO {
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException, EntryNotFoundException {
-        return null;
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?")) {
+                ps.setInt(1, gameID);
+                ResultSet rs = ps.executeQuery();
+                if (!rs.next()) {
+                    throw new EntryNotFoundException(String.format("Game with ID %d not found.", gameID));
+                }
+                return new GameData(gameID,
+                        rs.getString("whiteUsername"),
+                        rs.getString("blackUsername"),
+                        rs.getString("gameName"),
+                        rs.getString("game"));
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Error: %s", ex.getMessage()));
+        }
     }
 
     @Override
