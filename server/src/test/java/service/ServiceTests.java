@@ -9,7 +9,11 @@ import exceptions.UnauthorizedException;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
+import org.mindrot.jbcrypt.BCrypt;
 import request.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 
 public class ServiceTests {
@@ -22,10 +26,14 @@ public class ServiceTests {
     private UserDAO userDAO;
 
     @BeforeEach
-    public void init() {
-        AuthDAO authDAO = new MemoryAuthDAO();
-        gameDAO = new MemoryGameDAO();
-        userDAO = new MemoryUserDAO();
+    public void init() throws DataAccessException {
+        AuthDAO authDAO = new DatabaseAuthDAO();
+        gameDAO = new DatabaseGameDAO();
+        userDAO = new DatabaseUserDAO();
+
+        authDAO.clear();
+        gameDAO.clear();
+        userDAO.clear();
 
         clearService = new ClearService(authDAO, gameDAO, userDAO);
         userService = new UserService(userDAO, authDAO);
@@ -41,7 +49,10 @@ public class ServiceTests {
     public void successRegister() {
         Assertions.assertDoesNotThrow(() -> {
                 userService.register(new RegisterRequest("myName", "myPass", "email@email.org"));
-                Assertions.assertEquals(new UserData("myName", "myPass", "email@email.org"), userDAO.getUser("myName"));
+                UserData fromDatabase = userDAO.getUser("myName");
+                Assertions.assertEquals("myName", fromDatabase.username());
+                Assertions.assertTrue(BCrypt.checkpw("myPass", fromDatabase.password()));
+                Assertions.assertEquals("email@email.org", fromDatabase.email());
         });
     }
 

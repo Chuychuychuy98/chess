@@ -32,12 +32,7 @@ public class StandardAPITests {
 
     @BeforeAll
     public static void init() {
-        try {
-            server = new Server();
-        } catch (Throwable ex) {
-            System.out.printf("Unable to start server for testing: %s%n", ex.getMessage());
-            return;
-        }
+        server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
 

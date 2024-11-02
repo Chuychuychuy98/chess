@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -126,10 +127,9 @@ public class DataAccessTests {
                     ps.setString(1, "myname");
                     ResultSet rs = ps.executeQuery();
                     Assertions.assertTrue(rs.next());
-                    Assertions.assertEquals(data,
-                            new UserData(rs.getString("username"),
-                                    rs.getString("password"),
-                                    rs.getString("email")));
+                    Assertions.assertEquals(data.username(), rs.getString("username"));
+                    Assertions.assertTrue(BCrypt.checkpw(data.password(), rs.getString("password")));
+                    Assertions.assertEquals(data.email(), rs.getString("email"));
                 }
             }
         });
@@ -147,7 +147,10 @@ public class DataAccessTests {
         UserData data = new UserData("user", "pass", "email@email.com");
         Assertions.assertDoesNotThrow(() -> {
             userDAO.createUser(data);
-            Assertions.assertEquals(data, userDAO.getUser("user"));
+            UserData fromDatabase = userDAO.getUser("user");
+            Assertions.assertEquals(data.username(), fromDatabase.username());
+            Assertions.assertTrue(BCrypt.checkpw(data.password(), fromDatabase.password()));
+            Assertions.assertEquals(data.email(), fromDatabase.email());
         });
     }
 
