@@ -236,4 +236,29 @@ public class DataAccessTests {
     public void getNonexistentGame() {
         Assertions.assertThrows(EntryNotFoundException.class, () -> gameDAO.getGame(12345678));
     }
+
+    @Test
+    public void listAllGames() {
+        Assertions.assertDoesNotThrow(() -> {
+            GameData[] games = {
+                    new GameData(1, "white", "black", "game", new ChessGame()),
+                    new GameData(2, "white", "black", "game", new ChessGame()),
+                    new GameData(3, "white", "black", "game", new ChessGame())
+            };
+            for (GameData data : games) {
+                gameDAO.createGame(data);
+            }
+            GameData[] fromDatabase = gameDAO.listGames();
+            for (int i = 0; i < games.length; i++) {
+                Assertions.assertEquals(games[i], fromDatabase[i]);
+            }
+        });
+    }
+
+    @Test
+    public void listAllGamesEmpty() {
+        Assertions.assertDoesNotThrow(() -> {
+            Assertions.assertEquals(0, gameDAO.listGames().length);
+        });
+    }
 }
