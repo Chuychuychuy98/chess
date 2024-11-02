@@ -187,7 +187,8 @@ public class DataAccessTests {
             GameData gameData = new GameData(1, "white", "black", "name", new ChessGame());
             gameDAO.createGame(gameData);
             try (Connection conn = DatabaseManager.getConnection()) {
-                try (PreparedStatement ps = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?")) {
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?")) {
                     ps.setInt(1, 1);
                     ResultSet rs = ps.executeQuery();
                     Assertions.assertTrue(rs.next());

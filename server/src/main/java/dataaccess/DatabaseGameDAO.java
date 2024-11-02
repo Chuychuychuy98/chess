@@ -56,7 +56,8 @@ public class DatabaseGameDAO implements GameDAO {
     @Override
     public GameData getGame(int gameID) throws DataAccessException, EntryNotFoundException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?")) {
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?")) {
                 ps.setInt(1, gameID);
                 ResultSet rs = ps.executeQuery();
                 if (!rs.next()) {
@@ -98,7 +99,8 @@ public class DatabaseGameDAO implements GameDAO {
     @Override
     public void updateGame(int gameID, ChessGame.TeamColor color, String newUsername) throws DataAccessException, EntryNotFoundException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?")) {
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?")) {
                 ps.setInt(1, gameID);
                 ResultSet rs = ps.executeQuery();
                 if (!rs.next()) {
