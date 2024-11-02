@@ -1,5 +1,7 @@
 package chess;
 
+import com.google.gson.Gson;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -19,6 +21,21 @@ public class ChessBoard {
 
     public ChessBoard(Map<ChessPosition, ChessPiece> pieces) {
         this.pieces = pieces;
+    }
+
+    public ChessBoard(String[] pairs) {
+        pieces = new HashMap<>();
+        for (String pair : pairs) {
+            pair += "}";
+            if (pair.charAt(0) == ',') {
+                pair = pair.substring(1);
+            }
+            String pos = pair.substring(2, pair.indexOf(")"));
+            int row = Integer.parseInt(pos.substring(0, pos.indexOf(",")));
+            int col = Integer.parseInt(pos.substring(pos.indexOf(" ")+1));
+            pieces.put(ChessPosition.getPosition(row, col),
+                    new Gson().fromJson(pair.substring(pair.indexOf(":")+1), ChessPiece.class));
+        }
     }
 
     public static ChessBoard defaultBoard() {

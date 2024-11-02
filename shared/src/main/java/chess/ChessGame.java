@@ -1,8 +1,6 @@
 package chess;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -23,6 +21,21 @@ public class ChessGame {
     public ChessGame(TeamColor turn, ChessBoard board) {
         this.turn = turn;
         this.board = board;
+    }
+
+    public ChessGame(String serializedGame) {
+        String turn = serializedGame.substring(9, 14);
+        if (turn.equals("WHITE")) {
+            this.turn = TeamColor.WHITE;
+        }
+        else if (turn.equals("BLACK")) {
+            this.turn = TeamColor.BLACK;
+        }
+        else {
+            throw new IllegalArgumentException("Error: Game was not serialized properly");
+        }
+        this.board = new ChessBoard(serializedGame.substring(35, serializedGame.length()-3).split("}"));
+
     }
 
     /**
@@ -169,5 +182,22 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return turn == chessGame.turn && Objects.equals(board, chessGame.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(turn, board);
     }
 }
