@@ -29,7 +29,7 @@ public class Server {
               whiteUsername VARCHAR(256),
               blackUsername VARCHAR(256),
               gameName VARCHAR(256) NOT NULL,
-              game VARCHAR(256) NOT NULL,
+              game VARCHAR(4096) NOT NULL,
               PRIMARY KEY (gameID)
             )
             """,
