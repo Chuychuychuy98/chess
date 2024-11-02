@@ -222,4 +222,18 @@ public class DataAccessTests {
             }
         }
     }
+
+    @Test
+    public void getGameSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            GameData data = new GameData(1, "white", "black", "name", new ChessGame());
+            gameDAO.createGame(data);
+            Assertions.assertEquals(data, gameDAO.getGame(1));
+        });
+    }
+
+    @Test
+    public void getNonexistentGame() {
+        Assertions.assertThrows(EntryNotFoundException.class, () -> gameDAO.getGame(12345678));
+    }
 }
