@@ -38,7 +38,7 @@ public class DatabaseUserDAO implements UserDAO {
             }
             try (PreparedStatement ps = conn.prepareStatement("INSERT INTO user (username, password, email) VALUES (?, ?, ?)")) {
                 ps.setString(1, userData.username());
-                ps.setString(2, userData.password());
+                ps.setString(2, BCrypt.hashpw(userData.password(), BCrypt.gensalt()));
                 ps.setString(3, userData.email());
 
                 ps.executeUpdate();

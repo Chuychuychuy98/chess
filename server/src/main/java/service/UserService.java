@@ -6,6 +6,7 @@ import exceptions.EntryNotFoundException;
 import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import request.LoginRequest;
 import request.AuthTokenRequest;
 import request.RegisterRequest;
@@ -70,7 +71,7 @@ public class UserService {
         catch (EntryNotFoundException e) {
             throw new UnauthorizedException("Error: unauthorized.");
         }
-        if (user.password().equals(request.password())) {
+        if (BCrypt.checkpw(request.password(), user.password())) {
             AuthData newAuth = new AuthData(UUID.randomUUID().toString(), user.username());
             authDAO.createAuth(newAuth);
             return new AuthTokenResult(newAuth);
