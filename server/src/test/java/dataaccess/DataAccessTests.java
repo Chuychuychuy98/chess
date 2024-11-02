@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -257,8 +256,25 @@ public class DataAccessTests {
 
     @Test
     public void listAllGamesEmpty() {
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(0, gameDAO.listGames().length));
+    }
+
+    @Test
+    public void updateGameSuccess() {
         Assertions.assertDoesNotThrow(() -> {
-            Assertions.assertEquals(0, gameDAO.listGames().length);
+            GameData oldData = new GameData(1, "white",
+                    "black", "game", new ChessGame());
+            GameData newData = new GameData(1, "me",
+                    "black", "game", new ChessGame());
+            gameDAO.createGame(oldData);
+            gameDAO.updateGame(1, ChessGame.TeamColor.WHITE, "me");
+            Assertions.assertEquals(newData, gameDAO.getGame(1));
         });
+    }
+
+    @Test
+    public void updateNonexistentGame() {
+        Assertions.assertThrows(EntryNotFoundException.class,
+                () -> gameDAO.updateGame(1, ChessGame.TeamColor.BLACK, "me"));
     }
 }
