@@ -13,7 +13,14 @@ import java.sql.SQLException;
 public class DatabaseGameDAO implements GameDAO {
     @Override
     public void clear() throws DataAccessException {
-
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("TRUNCATE TABLE game")) {
+                ps.executeUpdate();
+            }
+        }
+        catch (SQLException ex) {
+            throw new DataAccessException("Error: could not connect to database");
+        }
     }
 
     @Override
