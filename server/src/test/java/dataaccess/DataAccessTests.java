@@ -1,9 +1,11 @@
 package dataaccess;
 
+import chess.ChessGame;
 import exceptions.DuplicateEntryException;
 import exceptions.EntryNotFoundException;
 import exceptions.UnauthorizedException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -175,5 +177,35 @@ public class DataAccessTests {
             userDAO.getUser("user2");
         });
         Assertions.assertThrows(EntryNotFoundException.class, () -> userDAO.getUser("user"));
+    }
+
+    @Test
+    public void createGameSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            GameData gameData = new GameData(1, "white", "black", "name", new ChessGame());
+            gameDAO.createGame(gameData);
+            try (Connection conn = DatabaseManager.getConnection()) {
+                try (PreparedStatement ps = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?")) {
+                    ps.setInt(1, 1);
+                    ResultSet rs = ps.executeQuery();
+                    Assertions.assertTrue(rs.next());
+
+                    Assertions.assertEquals(gameData,
+                            new GameData(rs.getInt("gameID"),
+                                    rs.getString("whiteUsername"),
+                                    rs.getString("blackUsername"),
+                                    rs.getString("gameName"),
+                                    rs.getString("game")));
+                }
+            }
+        });
+    }
+
+    @Test
+    public void createGameDuplicateID() {
+        Assertions.assertThrows(DuplicateEntryException.class, () -> {
+            gameDAO.createGame(new GameData(1, "white", "black", "name", new ChessGame()));
+            gameDAO.createGame(new GameData(1, "white", "black", "name", new ChessGame()));
+        });
     }
 }
