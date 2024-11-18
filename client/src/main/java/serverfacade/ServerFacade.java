@@ -15,6 +15,20 @@ public class ServerFacade {
         this.serverUrl = serverUrl;
     }
 
+    public void clear() throws ResponseException {
+        try {
+            URL url = (new URI(serverUrl + "/db")).toURL();
+            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            http.setRequestMethod("DELETE");
+            http.setDoOutput(true);
+
+            http.connect();
+        }
+        catch (Exception e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
+
     public AuthTokenResult register(String username, String password, String email) throws ResponseException {
         return this.makeRequest("POST", "/user", new RegisterRequest(username, password, email), AuthTokenResult.class);
     }
