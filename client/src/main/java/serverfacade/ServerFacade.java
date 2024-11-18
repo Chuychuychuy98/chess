@@ -2,6 +2,8 @@ package serverfacade;
 
 import com.google.gson.Gson;
 import exceptions.ResponseException;
+import request.RegisterRequest;
+import result.AuthTokenResult;
 
 import java.io.*;
 import java.net.*;
@@ -12,6 +14,11 @@ public class ServerFacade {
     public ServerFacade(String serverUrl) {
         this.serverUrl = serverUrl;
     }
+
+    public AuthTokenResult register(String username, String password, String email) throws ResponseException {
+        return this.makeRequest("POST", "/user", new RegisterRequest(username, password, email), AuthTokenResult.class);
+    }
+
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
