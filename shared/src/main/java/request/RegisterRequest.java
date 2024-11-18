@@ -1,7 +1,5 @@
 package request;
 
-import org.mindrot.jbcrypt.BCrypt;
-
 /**
  * Request class for the register endpoint.
  * @param username The requested username.

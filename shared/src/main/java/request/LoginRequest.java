@@ -1,7 +1,5 @@
 package request;
 
-import org.mindrot.jbcrypt.BCrypt;
-
 /**
  * Request class for login endpoint.
  * @param username The username trying to login.
