@@ -12,9 +12,6 @@ import org.junit.jupiter.api.*;
 import org.mindrot.jbcrypt.BCrypt;
 import request.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
 
 public class ServiceTests {
 
