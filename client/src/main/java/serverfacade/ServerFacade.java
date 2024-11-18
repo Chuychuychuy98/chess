@@ -17,7 +17,7 @@ public class ServerFacade {
 
     public void clear() throws ResponseException {
         try {
-            URL url = (new URI(serverUrl + "/db")).toURL();
+            URL url = (new URI("http://" + serverUrl + "/db")).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod("DELETE");
             http.setDoOutput(true);
@@ -35,7 +35,7 @@ public class ServerFacade {
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
-            URL url = (new URI(serverUrl + path)).toURL();
+            URL url = (new URI("http://" + serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
