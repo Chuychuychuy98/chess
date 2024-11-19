@@ -30,7 +30,7 @@ public class Client {
                     break;
                 case "login":
                     if (login(in)) {
-                        afterLogin();
+                        afterLogin(in);
                     }
                     else {
                         System.out.println("Failed to log in!");
@@ -38,7 +38,7 @@ public class Client {
                     break;
                 case "register":
                     if (register(in)) {
-                        afterLogin();
+                        afterLogin(in);
                     }
                     else {
                         System.out.println("Failed to register!");
@@ -52,8 +52,28 @@ public class Client {
         }
     }
 
-    public void afterLogin() {
-
+    public void afterLogin(Scanner in) {
+        while (true) {
+            System.out.print("[LOGGED_IN] >>> ");
+            String userInput = in.next();
+            switch (userInput) {
+                case "help":
+                    helpAfterLogin();
+                    break;
+                case "logout":
+                    break;
+                case "create":
+                    break;
+                case "list":
+                    break;
+                case "join":
+                    break;
+                case "observe":
+                    break;
+                default:
+                    System.out.println("Unrecognized command. For a list of available commands, type \"help\"");
+            }
+        }
     }
 
     public void helpBeforeLogin() {
@@ -69,11 +89,31 @@ public class Client {
     }
 
     public void helpAfterLogin() {
-
+        System.out.println("You logged in!!!");
     }
 
     public boolean login(Scanner in) {
-        return false;
+        if (in.hasNext()) {
+            String username = in.next();
+            if (in.hasNext()) {
+                String password = in.next();
+                try {
+                    authToken = server.login(username, password).authToken();
+                    return true;
+                }
+                catch (ResponseException e) {
+                    System.out.printf("Error: %s%n", e.getMessage());
+                    return false;
+                }
+            }
+            else {
+                System.out.println("Error: missing password");
+                return false;
+            }
+        }
+        else {
+            return loginGetInfo(in);
+        }
     }
 
     public boolean register(Scanner in) {
@@ -116,6 +156,21 @@ public class Client {
         String email = in.next();
         try {
             authToken = server.register(username, password, email).authToken();
+            return true;
+        }
+        catch (ResponseException e) {
+            System.out.printf("Error: %s%n", e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean loginGetInfo(Scanner in) {
+        System.out.print("Username: ");
+        String username = in.next();
+        System.out.print("Password: ");
+        String password = in.next();
+        try {
+            authToken = server.login(username, password).authToken();
             return true;
         }
         catch (ResponseException e) {
