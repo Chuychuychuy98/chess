@@ -70,6 +70,7 @@ public class Client {
                     }
                     return;
                 case "create":
+                    create(in);
                     break;
                 case "list":
                     break;
@@ -198,6 +199,18 @@ public class Client {
         catch (ResponseException e) {
             printError(e.getMessage());
             return false;
+        }
+    }
+
+    private void create(Scanner in) {
+        if (!in.hasNext()) {
+            System.out.print("Game name: ");
+        }
+        try {
+            server.create(in.next(), authToken);
+        }
+        catch (ResponseException e) {
+            printError(e.getMessage());
         }
     }
 
