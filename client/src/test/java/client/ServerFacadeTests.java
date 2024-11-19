@@ -1,4 +1,5 @@
 import exceptions.ResponseException;
+import model.GameData;
 import org.junit.jupiter.api.*;
 import server.Server;
 import serverfacade.ServerFacade;
@@ -78,5 +79,22 @@ public class ServerFacadeTests {
     @Test
     public void createFailure() {
         Assertions.assertThrows(ResponseException.class, () -> facade.create("new_game", "invalid"));
+    }
+
+    @Test
+    public void listSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            String authToken = facade.register("user", "pass", "abc@abc.abc").authToken();
+            facade.create("game1", authToken);
+            facade.create("game2", authToken);
+            GameData[] games = facade.list(authToken).games();
+            Assertions.assertEquals("game1", games[0].gameName());
+            Assertions.assertEquals("game2", games[1].gameName());
+        });
+    }
+
+    @Test
+    public void listFailure() {
+        Assertions.assertThrows(ResponseException.class, () -> facade.list("invalid"));
     }
 }
