@@ -211,7 +211,7 @@ public class Client {
             System.out.print("Game name: ");
         }
         try {
-            in.skip(" ");
+            in.skip(" *");
             server.create(in.nextLine(), authToken);
         }
         catch (ResponseException e) {
