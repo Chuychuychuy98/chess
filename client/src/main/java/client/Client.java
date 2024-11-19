@@ -1,6 +1,7 @@
 package client;
 
 import exceptions.ResponseException;
+import model.GameData;
 import serverfacade.ServerFacade;
 import ui.EscapeSequences;
 
@@ -74,6 +75,7 @@ public class Client {
                     create(in);
                     break;
                 case "list":
+                    list();
                     break;
                 case "join":
                     break;
@@ -209,9 +211,27 @@ public class Client {
             System.out.print("Game name: ");
         }
         try {
-            server.create(in.next(), authToken);
+            in.skip(" ");
+            server.create(in.nextLine(), authToken);
         }
         catch (ResponseException e) {
+            printError(e.getMessage());
+        }
+    }
+
+    private void list() {
+        try {
+            GameData[] games = server.list(authToken).games();
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Current games:" + EscapeSequences.RESET_TEXT_COLOR);
+            for (int i = 1; i <= games.length; i++) {
+                GameData game = games[i-1];
+                System.out.println(i + ": " + game.gameName());
+                System.out.println("  White: " + EscapeSequences.SET_TEXT_COLOR_MAGENTA +
+                        (game.whiteUsername() == null ? "Free" : game.whiteUsername()) + EscapeSequences.RESET_TEXT_COLOR);
+                System.out.println("  Black: " + EscapeSequences.SET_TEXT_COLOR_MAGENTA +
+                        (game.blackUsername() == null ? "Free" : game.blackUsername()) + EscapeSequences.RESET_TEXT_COLOR);
+            }
+        } catch (ResponseException e) {
             printError(e.getMessage());
         }
     }

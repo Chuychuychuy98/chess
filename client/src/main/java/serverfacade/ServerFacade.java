@@ -6,6 +6,7 @@ import request.CreateGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import result.AuthTokenResult;
+import result.ListResult;
 
 import java.io.*;
 import java.net.*;
@@ -38,6 +39,10 @@ public class ServerFacade {
 
     public void create(String gameName, String authToken) throws ResponseException {
         this.makeRequest("POST", "/game", new CreateGameRequest(gameName), authToken, null);
+    }
+
+    public ListResult list(String authToken) throws ResponseException {
+        return this.makeRequest("GET", "/game", null, authToken, ListResult.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, String authToken, Class<T> responseClass) throws ResponseException {
