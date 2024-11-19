@@ -41,4 +41,16 @@ public class ServerFacadeTests {
         });
     }
 
+    @Test
+    public void loginSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            facade.register("user", "pass", "abc@abc.abc");
+            facade.login("user", "pass");
+        });
+    }
+
+    @Test
+    public void loginFailure() {
+        Assertions.assertThrows(ResponseException.class, () -> facade.login("invalid", "none"));
+    }
 }
