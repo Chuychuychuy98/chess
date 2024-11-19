@@ -29,7 +29,11 @@ public class ServerFacade {
         return this.makeRequest("POST", "/session", new LoginRequest(username, password), null, AuthTokenResult.class);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    public void logout(String authToken) throws ResponseException {
+        this.makeRequest("DELETE", "/session", null, authToken, null);
+    }
+
+    private <T> T makeRequest(String method, String path, Object request, String authToken, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI("http://" + serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
