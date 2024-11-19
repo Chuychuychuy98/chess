@@ -88,6 +88,15 @@ public class ServerFacade {
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
+            if (status == 400) {
+                throw new ResponseException(status, "Malformed request");
+            }
+            if (status == 401) {
+                throw new ResponseException(status, "Unauthorized");
+            }
+            if (status == 409) {
+                throw new ResponseException(status, "That name is taken");
+            }
             throw new ResponseException(status, "failure: " + status);
         }
     }
