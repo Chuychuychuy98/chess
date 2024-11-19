@@ -7,4 +7,8 @@ public class ResponseException extends Exception {
         super(message);
         this.status = status;
     }
+
+    public int getStatus() {
+        return status;
+    }
 }
