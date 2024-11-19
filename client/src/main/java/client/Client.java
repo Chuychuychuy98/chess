@@ -95,9 +95,19 @@ public class Client {
         System.out.print(EscapeSequences.RESET_TEXT_COLOR);
     }
 
-    public void helpAfterLogin() {
-        System.out.println("You logged in!!!");
     private void helpAfterLogin() {
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "logout"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - log out of your account");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "create <NAME>"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - create a game");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "list"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - list all games");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "join <ID> [WHITE|BLACK]"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - join a game");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "observe <ID>"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - observe a game");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "help"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - print this help message");
     }
 
     private boolean login(Scanner in) {
