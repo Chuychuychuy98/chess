@@ -20,11 +20,12 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public void createGame(GameData gameData) throws DuplicateEntryException {
+    public int createGame(GameData gameData) throws DuplicateEntryException {
         if (database.get(gameData.gameID()) != null) {
             throw new DuplicateEntryException(String.format("Game with id %d already exists.", gameData.gameID()));
         }
         database.put(gameData.gameID(), gameData);
+        return gameData.gameID();
     }
 
     @Override

@@ -25,7 +25,7 @@ public class Server {
             """,
             """
             CREATE TABLE IF NOT EXISTS game (
-              gameID int NOT NULL,
+              gameID int AUTO_INCREMENT NOT NULL,
               whiteUsername VARCHAR(256),
               blackUsername VARCHAR(256),
               gameName VARCHAR(256) NOT NULL,

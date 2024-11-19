@@ -16,10 +16,11 @@ public interface GameDAO {
     /**
      * Add a new GameData to the database.
      * @param gameData The game to add.
+     * @return The new game's ID.
      * @throws DuplicateEntryException Indicates that the gameID was already taken.
      * @throws DataAccessException Indicates an error reaching the database.
      */
-    void createGame(GameData gameData) throws DataAccessException, DuplicateEntryException;
+    int createGame(GameData gameData) throws DataAccessException, DuplicateEntryException;
 
     /**
      * Retrieve a specified game with the given gameID.

@@ -5,10 +5,9 @@ import com.google.gson.Gson;
 
 
 public record GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
-    private static int nextID = 1;
 
     public GameData(String whiteUsername, String blackUsername, String gameName, ChessGame game) {
-        this(nextID++, whiteUsername, blackUsername, gameName, game);
+        this(0, whiteUsername, blackUsername, gameName, game);
     }
 
     public GameData(int id, String whiteUsername, String blackUsername, String gameName, String serializedGame) {
