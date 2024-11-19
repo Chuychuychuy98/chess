@@ -20,7 +20,7 @@ public class Client {
         beforeLogin();
     }
 
-    public void beforeLogin() {
+    private void beforeLogin() {
         Scanner in = new Scanner(System.in);
         while (true) {
             System.out.print("[LOGGED_OUT] >>> ");
@@ -53,7 +53,7 @@ public class Client {
         }
     }
 
-    public void afterLogin(Scanner in) {
+    private void afterLogin(Scanner in) {
         while (true) {
             System.out.printf("[%s] >>> ", username);
             String userInput = in.next().toLowerCase();
@@ -83,7 +83,7 @@ public class Client {
         }
     }
 
-    public void helpBeforeLogin() {
+    private void helpBeforeLogin() {
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "login <USERNAME> <PASSWORD>"
                 + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - create an account");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>"
@@ -97,9 +97,10 @@ public class Client {
 
     public void helpAfterLogin() {
         System.out.println("You logged in!!!");
+    private void helpAfterLogin() {
     }
 
-    public boolean login(Scanner in) {
+    private boolean login(Scanner in) {
         if (in.hasNext()) {
             String username = in.next();
             if (in.hasNext()) {
@@ -124,7 +125,7 @@ public class Client {
         }
     }
 
-    public boolean register(Scanner in) {
+    private boolean register(Scanner in) {
         if (in.hasNext()) {
             String username = in.next();
             if (in.hasNext()) {
@@ -156,7 +157,7 @@ public class Client {
         }
     }
 
-    public boolean registerGetInfo(Scanner in) {
+    private boolean registerGetInfo(Scanner in) {
         System.out.print("Username: ");
         String username = in.next();
         System.out.print("Password: ");
@@ -174,7 +175,7 @@ public class Client {
         }
     }
 
-    public boolean loginGetInfo(Scanner in) {
+    private boolean loginGetInfo(Scanner in) {
         System.out.print("Username: ");
         String username = in.next();
         System.out.print("Password: ");
