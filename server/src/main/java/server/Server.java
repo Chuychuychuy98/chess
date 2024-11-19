@@ -169,12 +169,12 @@ public class Server {
         checkAuthToken(authToken);
         JoinRequest joinRequest = new Gson().fromJson(req.body(), JoinRequest.class);
         if (joinRequest.playerColor() == null) {
-            throw new BadRequestException("Error: bad request");
+            throw new BadRequestException("Error: no team color set");
         }
         try {
             gameService.join(joinRequest, new AuthTokenRequest(authToken));
         } catch (EntryNotFoundException ex) {
-            throw new BadRequestException("Error: bad request");
+            throw new BadRequestException("Error: no game with that ID exists");
         }
         return "";
     }
