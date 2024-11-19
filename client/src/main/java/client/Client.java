@@ -11,6 +11,7 @@ public class Client {
     String authToken = null;
     String username = null;
     ServerFacade server;
+    GameData[] games = null;
 
     public Client(ServerFacade server) {
         this.server = server;
@@ -221,7 +222,7 @@ public class Client {
 
     private void list() {
         try {
-            GameData[] games = server.list(authToken).games();
+            games = server.list(authToken).games();
             System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Current games:" + EscapeSequences.RESET_TEXT_COLOR);
             for (int i = 1; i <= games.length; i++) {
                 GameData game = games[i-1];
