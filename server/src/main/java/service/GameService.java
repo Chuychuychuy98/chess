@@ -56,8 +56,7 @@ public class GameService {
             throws DataAccessException, UnauthorizedException, DuplicateEntryException {
         authDAO.checkAuth(authTokenRequest.authToken());
         GameData newGame = new GameData(null, null, request.gameName(), new ChessGame());
-        gameDAO.createGame(newGame);
-        return new CreateGameResult(newGame.gameID());
+        return new CreateGameResult(gameDAO.createGame(newGame));
     }
 
     /**

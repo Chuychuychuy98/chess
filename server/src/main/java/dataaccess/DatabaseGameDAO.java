@@ -45,7 +45,7 @@ public class DatabaseGameDAO implements GameDAO {
                     ps.setString(4, gameData.serializedGame());
 
                     ps.executeUpdate();
-                    ResultSet res = ps.getResultSet();
+                    ResultSet res = ps.getGeneratedKeys();
                     if (res.next()) {
                         return res.getInt(1);
                     }
