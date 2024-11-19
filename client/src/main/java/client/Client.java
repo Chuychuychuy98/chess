@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 public class Client {
     String authToken = null;
+    String username = null;
     ServerFacade server;
 
     public Client(ServerFacade server) {
@@ -54,7 +55,7 @@ public class Client {
 
     public void afterLogin(Scanner in) {
         while (true) {
-            System.out.print("[LOGGED_IN] >>> ");
+            System.out.printf("[%s] >>> ", username);
             String userInput = in.next();
             switch (userInput) {
                 case "help":
@@ -99,6 +100,7 @@ public class Client {
                 String password = in.next();
                 try {
                     authToken = server.login(username, password).authToken();
+                    this.username = username;
                     return true;
                 }
                 catch (ResponseException e) {
@@ -125,6 +127,7 @@ public class Client {
                     String email = in.next();
                     try {
                         authToken = server.register(username, password, email).authToken();
+                        this.username = username;
                         return true;
                     }
                     catch (ResponseException e) {
@@ -156,6 +159,7 @@ public class Client {
         String email = in.next();
         try {
             authToken = server.register(username, password, email).authToken();
+            this.username = username;
             return true;
         }
         catch (ResponseException e) {
@@ -171,6 +175,7 @@ public class Client {
         String password = in.next();
         try {
             authToken = server.login(username, password).authToken();
+            this.username = username;
             return true;
         }
         catch (ResponseException e) {
