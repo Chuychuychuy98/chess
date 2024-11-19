@@ -66,4 +66,17 @@ public class ServerFacadeTests {
     public void logoutFailure() {
         Assertions.assertThrows(ResponseException.class, () -> facade.logout("invalid"));
     }
+
+    @Test
+    public void createSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            String authToken = facade.register("user", "pass", "abc@abc.abc").authToken();
+            facade.create("new_game", authToken);
+        });
+    }
+
+    @Test
+    public void createFailure() {
+        Assertions.assertThrows(ResponseException.class, () -> facade.create("new_game", "invalid"));
+    }
 }
