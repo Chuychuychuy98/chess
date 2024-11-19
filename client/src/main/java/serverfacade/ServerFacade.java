@@ -17,16 +17,16 @@ public class ServerFacade {
     }
 
     public void clear() throws ResponseException {
-        this.makeRequest("DELETE", "/db", null, null);
+        this.makeRequest("DELETE", "/db", null, null, null);
 
     }
 
     public AuthTokenResult register(String username, String password, String email) throws ResponseException {
-        return this.makeRequest("POST", "/user", new RegisterRequest(username, password, email), AuthTokenResult.class);
+        return this.makeRequest("POST", "/user", new RegisterRequest(username, password, email), null, AuthTokenResult.class);
     }
 
     public AuthTokenResult login(String username, String password) throws ResponseException {
-        return this.makeRequest("POST", "/session", new LoginRequest(username, password), AuthTokenResult.class);
+        return this.makeRequest("POST", "/session", new LoginRequest(username, password), null, AuthTokenResult.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
@@ -35,6 +35,10 @@ public class ServerFacade {
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            if (authToken != null) {
+                http.setRequestProperty("Authorization", authToken);
+            }
 
             writeBody(request, http);
             http.connect();

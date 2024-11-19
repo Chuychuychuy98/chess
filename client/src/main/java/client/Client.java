@@ -62,7 +62,13 @@ public class Client {
                     helpAfterLogin();
                     break;
                 case "logout":
-                    break;
+                    try {
+                        server.logout(authToken);
+                    }
+                    catch (ResponseException e) {
+                        printError("Failed to log out");
+                    }
+                    return;
                 case "create":
                     break;
                 case "list":
