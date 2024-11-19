@@ -53,4 +53,17 @@ public class ServerFacadeTests {
     public void loginFailure() {
         Assertions.assertThrows(ResponseException.class, () -> facade.login("invalid", "none"));
     }
+
+    @Test
+    public void logoutSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            String authToken = facade.register("user", "pass", "abc@abc.abc").authToken();
+            facade.logout(authToken);
+        });
+    }
+
+    @Test
+    public void logoutFailure() {
+        Assertions.assertThrows(ResponseException.class, () -> facade.logout("invalid"));
+    }
 }
