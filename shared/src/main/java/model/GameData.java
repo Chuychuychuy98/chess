@@ -12,7 +12,7 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
     }
 
     public GameData(int id, String whiteUsername, String blackUsername, String gameName, String serializedGame) {
-        this(id, whiteUsername, blackUsername, gameName, new ChessGame(serializedGame));
+        this(id, whiteUsername, blackUsername, gameName, new Gson().fromJson(serializedGame, ChessGame.class));
     }
 
     /**

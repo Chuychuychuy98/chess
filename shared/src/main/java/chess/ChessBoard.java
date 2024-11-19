@@ -1,9 +1,5 @@
 package chess;
 
-import com.google.gson.Gson;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -13,29 +9,11 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private final Map<ChessPosition, ChessPiece> pieces;
+
+    private ChessPiece[][] pieces;
 
     public ChessBoard() {
-        pieces = new HashMap<>();
-    }
-
-    public ChessBoard(Map<ChessPosition, ChessPiece> pieces) {
-        this.pieces = pieces;
-    }
-
-    public ChessBoard(String[] pairs) {
-        pieces = new HashMap<>();
-        for (String pair : pairs) {
-            pair += "}";
-            if (pair.charAt(0) == ',') {
-                pair = pair.substring(1);
-            }
-            String pos = pair.substring(2, pair.indexOf(")"));
-            int row = Integer.parseInt(pos.substring(0, pos.indexOf(",")));
-            int col = Integer.parseInt(pos.substring(pos.indexOf(" ")+1));
-            pieces.put(ChessPosition.getPosition(row, col),
-                    new Gson().fromJson(pair.substring(pair.indexOf(":")+1), ChessPiece.class));
-        }
+        pieces = new ChessPiece[8][8];
     }
 
     public static ChessBoard defaultBoard() {
@@ -46,18 +24,18 @@ public class ChessBoard {
 
     public ChessBoard copyOf() {
         ChessBoard chessBoard = new ChessBoard();
-        for (ChessPosition position : pieces.keySet()) {
-            chessBoard.pieces.put(position, pieces.get(position));
+        for (int i = 0; i < 8; i++) {
+            System.arraycopy(pieces[i], 0, chessBoard.pieces[i], 0, 8);
         }
         return chessBoard;
     }
 
     public void copyBoard(ChessBoard copy) {
-        pieces.clear();
-        for (ChessPosition position : copy.pieces.keySet()) {
-            pieces.put(position, copy.pieces.get(position));
+        for (int i = 0; i < 8; i++) {
+            System.arraycopy(copy.pieces[i], 0, pieces[i], 0, 8);
         }
     }
+
 
     public void doMove(ChessMove move) {
         ChessPiece pieceToMove = getPiece(move.getStartPosition());
@@ -77,7 +55,7 @@ public class ChessBoard {
     }
 
     public void removePiece(ChessPosition position) {
-        pieces.remove(position);
+        pieces[position.getRow()-1][position.getColumn()-1] = null;
     }
 
     @Override
@@ -89,7 +67,7 @@ public class ChessBoard {
             return false;
         }
         ChessBoard that = (ChessBoard) o;
-        return Objects.equals(pieces, that.pieces);
+        return Objects.deepEquals(pieces, that.pieces);
     }
 
     @Override
@@ -104,7 +82,7 @@ public class ChessBoard {
             sb.append("|");
             for (int j = 1; j <= 8; j++) {
                 ChessPosition cur = ChessPosition.getPosition(i,j);
-                sb.append(pieces.get(cur) != null ? pieces.get(cur).toString() : " ");
+                sb.append(getPiece(cur) != null ? getPiece(cur).toString() : " ");
                 sb.append("|");
             }
             sb.append("\n");
@@ -119,7 +97,8 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        pieces.put(position, piece);
+        //pieces.put(position, piece);
+        pieces[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
     /**
@@ -130,7 +109,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return pieces.get(position);
+        return pieces[position.getRow()-1][position.getColumn()-1];
     }
 
     /**
@@ -139,14 +118,15 @@ public class ChessBoard {
      * @param color The color of the pieces.
      */
     private void placeSpecialPieces(int row, ChessGame.TeamColor color) {
-        pieces.put(ChessPosition.getPosition(row, 1), new ChessPiece(color, ChessPiece.PieceType.ROOK));
-        pieces.put(ChessPosition.getPosition(row, 2), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
-        pieces.put(ChessPosition.getPosition(row, 3), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
-        pieces.put(ChessPosition.getPosition(row, 4), new ChessPiece(color, ChessPiece.PieceType.QUEEN));
-        pieces.put(ChessPosition.getPosition(row, 5), new ChessPiece(color, ChessPiece.PieceType.KING));
-        pieces.put(ChessPosition.getPosition(row, 6), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
-        pieces.put(ChessPosition.getPosition(row, 7), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
-        pieces.put(ChessPosition.getPosition(row, 8), new ChessPiece(color, ChessPiece.PieceType.ROOK));
+        pieces[row][0] = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+        pieces[row][1] = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+        pieces[row][2] = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+        pieces[row][3] = new ChessPiece(color, ChessPiece.PieceType.QUEEN);
+        pieces[row][4] = new ChessPiece(color, ChessPiece.PieceType.KING);
+        pieces[row][5] = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+        pieces[row][6] = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+        pieces[row][7] = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+
     }
 
     /**
@@ -155,8 +135,8 @@ public class ChessBoard {
      * @param color The color of the pawns.
      */
     private void placePawns(int row, ChessGame.TeamColor color) {
-        for (int i = 1; i <= 8; i++) {
-            pieces.put(ChessPosition.getPosition(row, i), new ChessPiece(color, ChessPiece.PieceType.PAWN));
+        for (int i = 0; i < 8; i++) {
+            pieces[row][i] = new ChessPiece(color, ChessPiece.PieceType.PAWN);
         }
     }
 
@@ -165,11 +145,10 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        placeSpecialPieces(1, ChessGame.TeamColor.WHITE);
-        placeSpecialPieces(8, ChessGame.TeamColor.BLACK);
-
-        placePawns(2, ChessGame.TeamColor.WHITE);
-        placePawns(7, ChessGame.TeamColor.BLACK);
+        placeSpecialPieces(0, ChessGame.TeamColor.WHITE);
+        placeSpecialPieces(7, ChessGame.TeamColor.BLACK);
+        placePawns(1, ChessGame.TeamColor.WHITE);
+        placePawns(6, ChessGame.TeamColor.BLACK);
     }
 
     /**
@@ -198,28 +177,34 @@ public class ChessBoard {
 
     public boolean isInCheck(ChessGame.TeamColor team) {
         ChessPosition kingPos = null;
-        for (ChessPosition pos : pieces.keySet()) {
-            ChessPiece piece = pieces.get(pos);
-            if (piece != null && piece.getTeamColor() == team && piece.getPieceType() == ChessPiece.PieceType.KING) {
-                kingPos = pos;
-                break;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = pieces[i][j];
+                if (piece != null && piece.getTeamColor() == team && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                    kingPos = ChessPosition.getPosition(i+1, j+1);
+                    break;
+                }
             }
         }
 
-        for (ChessPosition pos : pieces.keySet()) {
-            ChessPiece attacker = pieces.get(pos);
-            if (attacker != null && attacker.getTeamColor() != team) {
-                for (ChessMove move : attacker.pieceMoves(this, pos)) {
-                    if (move.getEndPosition().equals(kingPos)) {
-                        return true;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece attacker = pieces[i][j];
+                if (attacker != null && attacker.getTeamColor() != team) {
+                    for (ChessMove move : attacker.pieceMoves(this, ChessPosition.getPosition(i+1,j+1))) {
+                        if (move.getEndPosition().equals(kingPos)) {
+                            return true;
+                        }
                     }
                 }
             }
         }
+
         return false;
     }
 
-    public Map<ChessPosition, ChessPiece> getPieces() {
+    public ChessPiece[][] getPieces() {
         return pieces;
     }
+
 }

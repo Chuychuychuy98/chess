@@ -23,21 +23,6 @@ public class ChessGame {
         this.board = board;
     }
 
-    public ChessGame(String serializedGame) {
-        String turn = serializedGame.substring(9, 14);
-        if (turn.equals("WHITE")) {
-            this.turn = TeamColor.WHITE;
-        }
-        else if (turn.equals("BLACK")) {
-            this.turn = TeamColor.BLACK;
-        }
-        else {
-            throw new IllegalArgumentException("Error: Game was not serialized properly");
-        }
-        this.board = new ChessBoard(serializedGame.substring(35, serializedGame.length()-3).split("}"));
-
-    }
-
     /**
      * Update the elements of this game to match a given new game.
      * @param newGame The game whose elements this game will copy.
@@ -143,10 +128,13 @@ public class ChessGame {
     }
 
     private boolean noValidMoves(TeamColor teamColor) {
-        Map<ChessPosition, ChessPiece> pieces = board.getPieces();
-        for (ChessPosition pos : pieces.keySet()) {
-            if (pieces.get(pos).getTeamColor() == teamColor && !validMoves(pos).isEmpty()) {
-                return false;
+        ChessPiece[][] pieces = board.getPieces();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (pieces[i][j] != null &&pieces[i][j].getTeamColor() == teamColor
+                        && !validMoves(ChessPosition.getPosition(i+1,j+1)).isEmpty()) {
+                    return false;
+                }
             }
         }
         return true;
