@@ -16,7 +16,7 @@ public class Client {
     }
 
     public void start() {
-        System.out.println("♕ Welcome to 240 Chess. Type Help to get started. ♕");
+        System.out.println("♕ Welcome to 240 Chess. Type help to get started. ♕");
         beforeLogin();
     }
 
@@ -24,7 +24,7 @@ public class Client {
         Scanner in = new Scanner(System.in);
         while (true) {
             System.out.print("[LOGGED_OUT] >>> ");
-            String userInput = in.next();
+            String userInput = in.next().toLowerCase();
             switch (userInput) {
                 case "help":
                     helpBeforeLogin();
@@ -56,7 +56,7 @@ public class Client {
     public void afterLogin(Scanner in) {
         while (true) {
             System.out.printf("[%s] >>> ", username);
-            String userInput = in.next();
+            String userInput = in.next().toLowerCase();
             switch (userInput) {
                 case "help":
                     helpAfterLogin();
