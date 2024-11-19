@@ -110,6 +110,7 @@ public class Client {
                 + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - observe a game");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "help"
                 + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - print this help message");
+        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
     }
 
     private boolean login(Scanner in) {
