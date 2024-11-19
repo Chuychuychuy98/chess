@@ -94,7 +94,7 @@ public class ServerFacade {
             if (status == 401) {
                 throw new ResponseException(status, "Unauthorized");
             }
-            if (status == 409) {
+            if (status == 403) {
                 throw new ResponseException(status, "That name is taken");
             }
             throw new ResponseException(status, "failure: " + status);

@@ -111,7 +111,7 @@ public class Server {
     }
 
     private void duplicateExceptionHandler(Exception ex, Request req, Response res) {
-        res.status(409);
+        res.status(403);
         res.body(formatError(ex.getMessage()));
     }
 
