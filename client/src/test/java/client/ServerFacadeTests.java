@@ -1,3 +1,4 @@
+import chess.ChessGame;
 import exceptions.ResponseException;
 import model.GameData;
 import org.junit.jupiter.api.*;
@@ -36,10 +37,11 @@ public class ServerFacadeTests {
 
     @Test
     public void registerFailure() {
-        Assertions.assertThrows(ResponseException.class, () -> {
+        ResponseException e = Assertions.assertThrows(ResponseException.class, () -> {
            facade.register("user", "pass", "abc@abc.abc");
            facade.register("user", "pass", "abc@abc.abc");
         });
+        Assertions.assertEquals(403, e.getStatus());
     }
 
     @Test
@@ -52,7 +54,10 @@ public class ServerFacadeTests {
 
     @Test
     public void loginFailure() {
-        Assertions.assertThrows(ResponseException.class, () -> facade.login("invalid", "none"));
+        ResponseException e =
+                Assertions.assertThrows(ResponseException.class, () -> facade.login("invalid", "none"));
+        Assertions.assertEquals(401, e.getStatus());
+
     }
 
     @Test
@@ -65,7 +70,9 @@ public class ServerFacadeTests {
 
     @Test
     public void logoutFailure() {
-        Assertions.assertThrows(ResponseException.class, () -> facade.logout("invalid"));
+        ResponseException e =
+                Assertions.assertThrows(ResponseException.class, () -> facade.logout("invalid"));
+        Assertions.assertEquals(401, e.getStatus());
     }
 
     @Test
@@ -78,7 +85,9 @@ public class ServerFacadeTests {
 
     @Test
     public void createFailure() {
-        Assertions.assertThrows(ResponseException.class, () -> facade.create("new_game", "invalid"));
+        ResponseException e = Assertions.assertThrows(ResponseException.class,
+                () -> facade.create("new_game", "invalid"));
+        Assertions.assertEquals(401, e.getStatus());
     }
 
     @Test
@@ -95,6 +104,29 @@ public class ServerFacadeTests {
 
     @Test
     public void listFailure() {
-        Assertions.assertThrows(ResponseException.class, () -> facade.list("invalid"));
+        ResponseException e =
+                Assertions.assertThrows(ResponseException.class, () -> facade.list("invalid"));
+        Assertions.assertEquals(401, e.getStatus());
+    }
+
+    @Test
+    public void joinSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            String authToken = facade.register("user", "pass", "abc@abc.abc").authToken();
+            facade.create("game1", authToken);
+            GameData[] games = facade.list(authToken).games();
+            facade.join(games[0].gameID(), ChessGame.TeamColor.WHITE, authToken);
+            games = facade.list(authToken).games();
+            Assertions.assertEquals("user", games[0].whiteUsername());
+        });
+    }
+
+    @Test
+    public void joinFailure() {
+        ResponseException e = Assertions.assertThrows(ResponseException.class, () -> {
+            String authToken = facade.register("user", "pass", "abc@abc.abc").authToken();
+            facade.join(23452345, ChessGame.TeamColor.WHITE, authToken);
+        });
+        Assertions.assertEquals(400, e.getStatus());
     }
 }
