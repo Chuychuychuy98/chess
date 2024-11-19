@@ -64,11 +64,12 @@ public class Client {
                 case "logout":
                     try {
                         server.logout(authToken);
+                        return;
                     }
                     catch (ResponseException e) {
-                        printError("Failed to log out");
+                        printError(e.getMessage());
+                        break;
                     }
-                    return;
                 case "create":
                     create(in);
                     break;
