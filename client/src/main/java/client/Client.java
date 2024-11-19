@@ -34,7 +34,7 @@ public class Client {
                         afterLogin(in);
                     }
                     else {
-                        System.out.println("Failed to log in!");
+                        printError("Failed to log in");
                     }
                     break;
                 case "register":
@@ -42,7 +42,7 @@ public class Client {
                         afterLogin(in);
                     }
                     else {
-                        System.out.println("Failed to register!");
+                        printError("Failed to register");
                     }
                     break;
                 case "quit":
@@ -104,12 +104,12 @@ public class Client {
                     return true;
                 }
                 catch (ResponseException e) {
-                    System.out.printf("Error: %s%n", e.getMessage());
+                    printError(e.getMessage());
                     return false;
                 }
             }
             else {
-                System.out.println("Error: missing password");
+                printError("Missing password");
                 return false;
             }
         }
@@ -131,17 +131,17 @@ public class Client {
                         return true;
                     }
                     catch (ResponseException e) {
-                        System.out.printf("Error: %s%n", e.getMessage());
+                        printError(e.getMessage());
                         return false;
                     }
                 }
                 else {
-                    System.out.println("Error: missing email address.");
+                    printError("Missing email address.");
                     return false;
                 }
             }
             else {
-                System.out.println("Error: missing password and email address.");
+                printError("Missing password and email address.");
                 return false;
             }
         }
@@ -163,7 +163,7 @@ public class Client {
             return true;
         }
         catch (ResponseException e) {
-            System.out.printf("Error: %s%n", e.getMessage());
+            printError(e.getMessage());
             return false;
         }
     }
@@ -179,8 +179,12 @@ public class Client {
             return true;
         }
         catch (ResponseException e) {
-            System.out.printf("Error: %s%n", e.getMessage());
+            printError(e.getMessage());
             return false;
         }
+    }
+
+    private void printError(String error) {
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Error: " + error + EscapeSequences.RESET_TEXT_COLOR);
     }
 }
