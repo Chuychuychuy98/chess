@@ -1,8 +1,10 @@
 package serverfacade;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exceptions.ResponseException;
 import request.CreateGameRequest;
+import request.JoinRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import result.AuthTokenResult;
@@ -43,6 +45,10 @@ public class ServerFacade {
 
     public ListResult list(String authToken) throws ResponseException {
         return this.makeRequest("GET", "/game", null, authToken, ListResult.class);
+    }
+
+    public void join(int gameID, ChessGame.TeamColor team, String authToken) throws ResponseException {
+        this.makeRequest("PUT", "/game", new JoinRequest(team, gameID), authToken, null);
     }
 
     private <T> T makeRequest(String method, String path, Object request, String authToken, Class<T> responseClass) throws ResponseException {

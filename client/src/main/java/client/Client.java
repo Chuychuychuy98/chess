@@ -1,10 +1,12 @@
 package client;
 
+import chess.ChessGame;
 import exceptions.ResponseException;
 import model.GameData;
 import serverfacade.ServerFacade;
 import ui.EscapeSequences;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Client {
@@ -79,6 +81,7 @@ public class Client {
                     list();
                     break;
                 case "join":
+                    join(in);
                     break;
                 case "observe":
                     break;
@@ -235,6 +238,63 @@ public class Client {
         } catch (ResponseException e) {
             printError(e.getMessage());
         }
+    }
+
+    private void join(Scanner in) {
+        if (games == null) {
+            System.out.println("You must first list the games with "+ EscapeSequences.SET_TEXT_COLOR_BLUE
+                    + "list" + EscapeSequences.RESET_TEXT_COLOR);
+            return;
+        }
+
+        int id = getId(in);
+
+        try {
+            ChessGame.TeamColor team = null;
+            String input = in.hasNext() ? in.next().toLowerCase() : "";
+
+            while (!input.equals("white") && !input.equals("black")) {
+                input = in.next().toLowerCase();
+                if (input.equals("white")) {
+                    team = ChessGame.TeamColor.WHITE;
+                }
+                else if (input.equals("black")) {
+                    team = ChessGame.TeamColor.BLACK;
+                }
+                else {
+                    printError("Please input either BLACK or WHITE.");
+                }
+            }
+            if (team == null) {
+                printError("Team was null.");
+                return;
+            }
+            server.join(games[id].gameID(), team, authToken);
+        }
+        catch (ResponseException e) {
+            printError(e.getMessage());
+        }
+    }
+
+    private int getId(Scanner in) {
+        int id = 0;
+        if (!in.hasNext()) {
+            System.out.print("Game ID: ");
+        }
+        while (id <= 0 || id > games.length) {
+            try {
+                id = in.nextInt();
+            } catch (InputMismatchException e) {
+                printError("Please input an integer game ID.");
+                while (in.hasNext()) {
+                    in.nextLine();
+                }
+            }
+            if (id <= 0 || id > games.length) {
+                printError("Please input a value corresponding to an existing game.");
+            }
+        }
+        return id;
     }
 
     private void printError(String error) {
