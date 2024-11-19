@@ -22,11 +22,13 @@ public class ServerFacade {
     }
 
     public AuthTokenResult register(String username, String password, String email) throws ResponseException {
-        return this.makeRequest("POST", "/user", new RegisterRequest(username, password, email), null, AuthTokenResult.class);
+        return this.makeRequest("POST", "/user",
+                new RegisterRequest(username, password, email), null, AuthTokenResult.class);
     }
 
     public AuthTokenResult login(String username, String password) throws ResponseException {
-        return this.makeRequest("POST", "/session", new LoginRequest(username, password), null, AuthTokenResult.class);
+        return this.makeRequest("POST", "/session",
+                new LoginRequest(username, password), null, AuthTokenResult.class);
     }
 
     public void logout(String authToken) throws ResponseException {
