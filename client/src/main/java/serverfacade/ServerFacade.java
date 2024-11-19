@@ -2,6 +2,7 @@ package serverfacade;
 
 import com.google.gson.Gson;
 import exceptions.ResponseException;
+import request.LoginRequest;
 import request.RegisterRequest;
 import result.AuthTokenResult;
 
@@ -16,21 +17,16 @@ public class ServerFacade {
     }
 
     public void clear() throws ResponseException {
-        try {
-            URL url = (new URI("http://" + serverUrl + "/db")).toURL();
-            HttpURLConnection http = (HttpURLConnection) url.openConnection();
-            http.setRequestMethod("DELETE");
-            http.setDoOutput(true);
+        this.makeRequest("DELETE", "/db", null, null);
 
-            http.connect();
-        }
-        catch (Exception e) {
-            throw new ResponseException(500, e.getMessage());
-        }
     }
 
     public AuthTokenResult register(String username, String password, String email) throws ResponseException {
         return this.makeRequest("POST", "/user", new RegisterRequest(username, password, email), AuthTokenResult.class);
+    }
+
+    public AuthTokenResult login(String username, String password) throws ResponseException {
+        return this.makeRequest("POST", "/session", new LoginRequest(username, password), AuthTokenResult.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
