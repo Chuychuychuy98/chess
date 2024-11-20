@@ -1,12 +1,13 @@
 package client;
 
+import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessPiece;
 import exceptions.ResponseException;
 import model.GameData;
 import serverfacade.ServerFacade;
 import ui.EscapeSequences;
 
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Client {
@@ -28,25 +29,51 @@ public class Client {
         Scanner in = new Scanner(System.in);
         while (true) {
             System.out.print("[LOGGED_OUT] >>> ");
-            String userInput = in.next().toLowerCase();
-            switch (userInput) {
+            String userInput = in.nextLine();
+            String[] args = userInput.split(" +");
+            switch (args[0].toLowerCase()) {
                 case "help":
                     helpBeforeLogin();
                     break;
                 case "login":
-                    if (login(in)) {
-                        afterLogin(in);
+                    if (args.length > 3) {
+                        printError("Too many arguments given. " + EscapeSequences.SET_TEXT_COLOR_BLUE + "login" +
+                                EscapeSequences.SET_TEXT_COLOR_RED + " takes a username and a password.");
+                    }
+                    else if (args.length == 2) {
+                        printError("Missing password.");
+                    }
+                    else if (args.length == 3) {
+                        if (loginArgsProvided(args[1], args[2])) {
+                            afterLogin(in);
+                        }
                     }
                     else {
-                        printError("Failed to log in");
+                        if (loginGetArgs(in)) {
+                            afterLogin(in);
+                        }
                     }
                     break;
                 case "register":
-                    if (register(in)) {
-                        afterLogin(in);
+                    if (args.length > 4) {
+                        printError("Too many arguments given. " + EscapeSequences.SET_TEXT_COLOR_BLUE + "register" +
+                                EscapeSequences.SET_TEXT_COLOR_RED + " takes a username, password, and email.");
+                    }
+                    else if (args.length == 3) {
+                        printError("Missing email.");
+                    }
+                    else if (args.length == 2) {
+                        printError("Missing password and email.");
+                    }
+                    else if (args.length == 1) {
+                        if (registerGetArgs(in)) {
+                            afterLogin(in);
+                        }
                     }
                     else {
-                        printError("Failed to register");
+                        if (registerArgsProvided(args[1], args[2], args[2])) {
+                            afterLogin(in);
+                        }
                     }
                     break;
                 case "quit":
@@ -60,12 +87,18 @@ public class Client {
     private void afterLogin(Scanner in) {
         while (true) {
             System.out.printf("[%s] >>> ", username);
-            String userInput = in.next().toLowerCase();
-            switch (userInput) {
+            String userInput = in.nextLine();
+            String[] args = userInput.split(" +");
+            switch (args[0].toLowerCase()) {
                 case "help":
                     helpAfterLogin();
                     break;
                 case "logout":
+                    if (args.length > 1) {
+                        printError(EscapeSequences.SET_TEXT_COLOR_BLUE + "logout" +
+                                EscapeSequences.SET_TEXT_COLOR_RED + "does not take any arguments.");
+                        break;
+                    }
                     try {
                         server.logout(authToken);
                         return;
@@ -75,15 +108,52 @@ public class Client {
                         break;
                     }
                 case "create":
-                    create(in);
+                    if (args.length == 1) {
+                        createGetName(in);
+                    }
+                    else {
+                        try {
+                            server.create(userInput.substring(userInput.indexOf(args[1])), authToken);
+                        }
+                        catch (ResponseException e) {
+                            printError(e.getMessage());
+                        }
+                    }
                     break;
                 case "list":
+                    if (args.length > 1) {
+                        printError(EscapeSequences.SET_TEXT_COLOR_BLUE + "list" +
+                                EscapeSequences.SET_TEXT_COLOR_RED + " does not take any arguments.");
+                        break;
+                    }
                     list();
                     break;
                 case "join":
-                    join(in);
+                    if (args.length > 3) {
+                        printError("Too many arguments given. " + EscapeSequences.SET_TEXT_COLOR_BLUE + "join" +
+                                EscapeSequences.SET_TEXT_COLOR_RED + " takes an ID and a team color");
+                    }
+                    else if (args.length == 2) {
+                        printError("Missing team color.");
+                    }
+                    else if (args.length == 1) {
+                        joinGetArgs(in);
+                    }
+                    else {
+                        joinArgsProvided(args[1], args[2]);
+                    }
                     break;
                 case "observe":
+                    if (args.length > 2) {
+                        printError("Too many arguments given. " + EscapeSequences.SET_TEXT_COLOR_BLUE + "observe" +
+                                EscapeSequences.SET_TEXT_COLOR_RED + " takes only an ID");
+                    }
+                    else if (args.length == 1){
+                        observeGetArgs(in);
+                    }
+                    else {
+                        observeArgsProvided(args[1]);
+                    }
                     break;
                 default:
                     System.out.println("Unrecognized command. For a list of available commands, type \"help\"");
@@ -119,86 +189,28 @@ public class Client {
         System.out.print(EscapeSequences.RESET_TEXT_COLOR);
     }
 
-    private boolean login(Scanner in) {
-        if (in.hasNext()) {
-            String username = in.next();
-            if (in.hasNext()) {
-                String password = in.next();
-                try {
-                    authToken = server.login(username, password).authToken();
-                    this.username = username;
-                    return true;
-                }
-                catch (ResponseException e) {
-                    printError(e.getMessage());
-                    return false;
-                }
+    private boolean loginGetArgs(Scanner in) {
+        String username;
+        String password;
+        while (true) {
+            System.out.print("Username: ");
+            username = in.nextLine();
+            if (username.contains(" ")) {
+                printError("Username must be one word.");
             }
             else {
-                printError("Missing password");
-                return false;
+                break;
             }
         }
-        else {
-            return loginGetInfo(in);
-        }
-    }
-
-    private boolean register(Scanner in) {
-        if (in.hasNext()) {
-            String username = in.next();
-            if (in.hasNext()) {
-                String password = in.next();
-                if (in.hasNext()) {
-                    String email = in.next();
-                    try {
-                        authToken = server.register(username, password, email).authToken();
-                        this.username = username;
-                        return true;
-                    }
-                    catch (ResponseException e) {
-                        printError(e.getMessage());
-                        return false;
-                    }
-                }
-                else {
-                    printError("Missing email address.");
-                    return false;
-                }
-            }
-            else {
-                printError("Missing password and email address.");
-                return false;
+        while (true) {
+            System.out.print("Password: ");
+            password = in.nextLine();
+            if (password.contains(" ")) {
+                printError("Password must be one word.");
+            } else {
+                break;
             }
         }
-        else {
-            return registerGetInfo(in);
-        }
-    }
-
-    private boolean registerGetInfo(Scanner in) {
-        System.out.print("Username: ");
-        String username = in.next();
-        System.out.print("Password: ");
-        String password = in.next();
-        System.out.print("Email: ");
-        String email = in.next();
-        try {
-            authToken = server.register(username, password, email).authToken();
-            this.username = username;
-            return true;
-        }
-        catch (ResponseException e) {
-            printError(e.getMessage());
-            return false;
-        }
-    }
-
-    private boolean loginGetInfo(Scanner in) {
-        System.out.print("Username: ");
-        String username = in.next();
-        System.out.print("Password: ");
-        String password = in.next();
         try {
             authToken = server.login(username, password).authToken();
             this.username = username;
@@ -210,10 +222,97 @@ public class Client {
         }
     }
 
-    private void create(Scanner in) {
-        if (!in.hasNext()) {
-            System.out.print("Game name: ");
+    private boolean loginArgsProvided(String username, String password) {
+        if (username.contains(" ")) {
+            printError("Username must be one word.");
+            return false;
         }
+        if (password.contains(" ")) {
+            printError("Password must be one word.");
+            return false;
+        }
+        try {
+            authToken = server.login(username, password).authToken();
+            this.username = username;
+            return true;
+        }
+        catch (ResponseException e) {
+            printError(e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean registerArgsProvided(String username, String password, String email) {
+            if (username.contains(" ")) {
+                printError("Username must be one word.");
+                return false;
+            }
+            if (password.contains(" ")) {
+                printError("Password must be one word.");
+                return false;
+            }
+            if (email.contains(" ")) {
+                printError("Email may not contain spaces.");
+                return false;
+            }
+            try {
+                authToken = server.register(username, password, email).authToken();
+                this.username = username;
+                return true;
+            }
+            catch (ResponseException e) {
+                printError(e.getMessage());
+                return false;
+            }
+    }
+
+    private boolean registerGetArgs(Scanner in) {
+        String username;
+        String password;
+        String email;
+        while (true) {
+            System.out.print("Username: ");
+            username = in.nextLine();
+            if (username.contains(" ")) {
+                printError("Username must be one word.");
+            }
+            else {
+                break;
+            }
+        }
+        while (true) {
+            System.out.print("Password: ");
+            password = in.nextLine();
+            if (password.contains(" ")) {
+                printError("Password must be one word.");
+            }
+            else {
+                break;
+            }
+        }
+        while (true) {
+            System.out.print("Email: ");
+            email = in.nextLine();
+            if (email.contains(" ")) {
+                printError("Email may not contain spaces.");
+            }
+            else {
+                break;
+            }
+        }
+        try {
+            authToken = server.register(username, password, email).authToken();
+            this.username = username;
+            return true;
+        }
+        catch (ResponseException e) {
+            printError(e.getMessage());
+            return false;
+        }
+    }
+
+    private void createGetName(Scanner in) {
+        System.out.print("Game name: ");
         try {
             in.skip(" *");
             server.create(in.nextLine(), authToken);
@@ -240,36 +339,71 @@ public class Client {
         }
     }
 
-    private void join(Scanner in) {
+    private void joinArgsProvided(String idString, String teamString) {
+        if (games == null) {
+            System.out.println("You must first list the games with "+ EscapeSequences.SET_TEXT_COLOR_BLUE
+                    + "list" + EscapeSequences.RESET_TEXT_COLOR);
+            return;
+        }
+        int id;
+        try {
+            id = Integer.parseInt(idString);
+        }
+        catch (NumberFormatException e) {
+            printError("Please proved a numerical ID.");
+            return;
+        }
+        if (id <= 0 || id > games.length) {
+            printError("Game ID must correspond to an existing game.");
+            return;
+        }
+        if (!teamString.equals("white") && !teamString.equals("black")) {
+            printError("Team color must be WHITE or BLACK.");
+            return;
+        }
+
+        try {
+            server.join(id, teamString.equals("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, authToken);
+            print(games[id-1].game().getBoard());
+        }
+        catch (ResponseException e) {
+            printError(e.getMessage());
+        }
+    }
+
+    private void joinGetArgs(Scanner in) {
         if (games == null) {
             System.out.println("You must first list the games with "+ EscapeSequences.SET_TEXT_COLOR_BLUE
                     + "list" + EscapeSequences.RESET_TEXT_COLOR);
             return;
         }
 
+        System.out.print("Game ID: ");
         int id = getId(in);
 
         try {
-            ChessGame.TeamColor team = null;
-            String input = in.hasNext() ? in.next().toLowerCase() : "";
-
-            while (!input.equals("white") && !input.equals("black")) {
+            ChessGame.TeamColor team;
+            String input;
+            while (true) {
+                System.out.print("Team Color: ");
                 input = in.next().toLowerCase();
                 if (input.equals("white")) {
                     team = ChessGame.TeamColor.WHITE;
+                    break;
                 }
                 else if (input.equals("black")) {
                     team = ChessGame.TeamColor.BLACK;
+                    break;
                 }
                 else {
                     printError("Please input either BLACK or WHITE.");
+                    if (in.hasNext()) {
+                        in.nextLine();
+                    }
                 }
             }
-            if (team == null) {
-                printError("Team was null.");
-                return;
-            }
-            server.join(games[id].gameID(), team, authToken);
+            server.join(games[id-1].gameID(), team, authToken);
+            print(games[id-1].game().getBoard());
         }
         catch (ResponseException e) {
             printError(e.getMessage());
@@ -278,17 +412,13 @@ public class Client {
 
     private int getId(Scanner in) {
         int id = 0;
-        if (!in.hasNext()) {
-            System.out.print("Game ID: ");
-        }
+        System.out.print("Game ID: ");
         while (id <= 0 || id > games.length) {
+            String line = in.nextLine();
             try {
-                id = in.nextInt();
-            } catch (InputMismatchException e) {
-                printError("Please input an integer game ID.");
-                while (in.hasNext()) {
-                    in.nextLine();
-                }
+                id = Integer.parseInt(line);
+            } catch (NumberFormatException e) {
+                printError("Please input a single integer game ID.");
             }
             if (id <= 0 || id > games.length) {
                 printError("Please input a value corresponding to an existing game.");
@@ -297,7 +427,138 @@ public class Client {
         return id;
     }
 
+    private void observeArgsProvided(String idString) {
+        if (games == null) {
+            System.out.println("You must first list the games with "+ EscapeSequences.SET_TEXT_COLOR_BLUE
+                    + "list" + EscapeSequences.RESET_TEXT_COLOR);
+            return;
+        }
+
+        int id;
+        try {
+            id = Integer.parseInt(idString);
+        }
+        catch (NumberFormatException e) {
+            printError("Please proved a numerical ID.");
+            return;
+        }
+
+        print(games[id-1].game().getBoard());
+    }
+
+    private void observeGetArgs(Scanner in) {
+        if (games == null) {
+            System.out.println("You must first list the games with "+ EscapeSequences.SET_TEXT_COLOR_BLUE
+                    + "list" + EscapeSequences.RESET_TEXT_COLOR);
+            return;
+        }
+        int id = getId(in);
+        print(games[id-1].game().getBoard());
+    }
+
     private void printError(String error) {
         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Error: " + error + EscapeSequences.RESET_TEXT_COLOR);
+    }
+
+    private void print(ChessBoard board) {
+        printWhiteTop(board.getPieces());
+        printBlackTop(board.getPieces());
+    }
+
+    private void printBlackTop(ChessPiece[][] pieces) {
+        System.out.print("   ");
+        for (int i = 0; i < 8; i++) {
+            System.out.print(" " + Character.toString('ａ' + i) + " ");
+        }
+        System.out.println("   " + EscapeSequences.RESET_BG_COLOR);
+        for (int i = 7; i >= 0; i--) {
+            System.out.print(" " + (i+1) + " ");
+            for (int j = 0; j < 8; j++) {
+                if (j % 2 != i % 2) {
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                }
+                else {
+                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
+                }
+                ChessPiece piece = pieces[i][j];
+                if (piece == null) {
+                    System.out.print(EscapeSequences.EMPTY);
+                    continue;
+                }
+
+                String pieceString = getPieceString(piece);
+                System.out.print(pieceString + EscapeSequences.RESET_TEXT_COLOR);
+            }
+            System.out.print(EscapeSequences.RESET_BG_COLOR);
+            System.out.print(" " + (i+1) + " ");
+            System.out.println(EscapeSequences.RESET_BG_COLOR);
+        }
+        System.out.print("   ");
+        for (int i = 0; i < 8; i++) {
+            System.out.print(" " + Character.toString('ａ' + i) + " ");
+        }
+        System.out.println("   " + EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+    }
+
+    private void printWhiteTop(ChessPiece[][] pieces) {
+        System.out.print("   ");
+        for (int i = 0; i < 8; i++) {
+            System.out.print(" " + Character.toString('ｈ' - i) + " ");
+        }
+        System.out.println("   " + EscapeSequences.RESET_BG_COLOR);
+        for (int i = 0; i < 8; i++) {
+            System.out.print(" " + (i+1) + " ");
+            for (int j = 7; j >= 0; j--) {
+                if (j % 2 != i % 2) {
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                }
+                else {
+                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
+                }
+                ChessPiece piece = pieces[i][j];
+                if (piece == null) {
+                    System.out.print(EscapeSequences.EMPTY);
+                    continue;
+                }
+
+                String pieceString = getPieceString(piece);
+                System.out.print(pieceString + EscapeSequences.RESET_TEXT_COLOR);
+            }
+            System.out.print(EscapeSequences.RESET_BG_COLOR);
+            System.out.print(" " + (i+1) + " ");
+            System.out.println(EscapeSequences.RESET_BG_COLOR);
+        }
+        System.out.print("   ");
+        for (int i = 0; i < 8; i++) {
+            System.out.print(" " + Character.toString('ｈ' - i) + " ");
+        }
+        System.out.println("   " + EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+    }
+
+    private String getPieceString(ChessPiece piece) {
+        String pieceString;
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            pieceString = EscapeSequences.SET_TEXT_COLOR_WHITE +
+                switch (piece.getPieceType()) {
+                    case KING -> EscapeSequences.WHITE_KING;
+                    case QUEEN -> EscapeSequences.WHITE_QUEEN;
+                    case BISHOP -> EscapeSequences.WHITE_BISHOP;
+                    case KNIGHT -> EscapeSequences.WHITE_KNIGHT;
+                    case ROOK -> EscapeSequences.WHITE_ROOK;
+                    case PAWN ->  EscapeSequences.WHITE_PAWN;
+                };
+        }
+        else {
+            pieceString = EscapeSequences.SET_TEXT_COLOR_BLACK +
+                    switch (piece.getPieceType()) {
+                        case KING -> EscapeSequences.BLACK_KING;
+                        case QUEEN -> EscapeSequences.BLACK_QUEEN;
+                        case BISHOP -> EscapeSequences.BLACK_BISHOP;
+                        case KNIGHT -> EscapeSequences.BLACK_KNIGHT;
+                        case ROOK -> EscapeSequences.BLACK_ROOK;
+                        case PAWN ->  EscapeSequences.BLACK_PAWN;
+                    };
+        }
+        return pieceString;
     }
 }

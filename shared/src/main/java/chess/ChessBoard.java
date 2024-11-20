@@ -10,7 +10,7 @@ import java.util.Objects;
  */
 public class ChessBoard {
 
-    private ChessPiece[][] pieces;
+    private final ChessPiece[][] pieces;
 
     public ChessBoard() {
         pieces = new ChessPiece[8][8];
@@ -206,5 +206,4 @@ public class ChessBoard {
     public ChessPiece[][] getPieces() {
         return pieces;
     }
-
 }

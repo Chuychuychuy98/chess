@@ -103,13 +103,13 @@ public class ServerFacade {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
             if (status == 400) {
-                throw new ResponseException(status, "Malformed request");
+                throw new ResponseException(status, "Malformed request.");
             }
             if (status == 401) {
-                throw new ResponseException(status, "Unauthorized");
+                throw new ResponseException(status, "Unauthorized.");
             }
             if (status == 403) {
-                throw new ResponseException(status, "That name is taken");
+                throw new ResponseException(status, "Already taken.");
             }
             throw new ResponseException(status, "failure: " + status);
         }
