@@ -189,28 +189,23 @@ public class Client {
         System.out.print(EscapeSequences.RESET_TEXT_COLOR);
     }
 
-    private boolean loginGetArgs(Scanner in) {
-        String username;
-        String password;
+    private String getInput(Scanner in, String prompt) {
+        String input;
         while (true) {
-            System.out.print("Username: ");
-            username = in.nextLine();
-            if (username.contains(" ")) {
-                printError("Username must be one word.");
+            System.out.print(prompt + ": ");
+            input = in.nextLine();
+            if (input.contains(" ")) {
+                printError(prompt + " must not contain spaces.");
             }
             else {
-                break;
+                return input;
             }
         }
-        while (true) {
-            System.out.print("Password: ");
-            password = in.nextLine();
-            if (password.contains(" ")) {
-                printError("Password must be one word.");
-            } else {
-                break;
-            }
-        }
+    }
+
+    private boolean loginGetArgs(Scanner in) {
+        String username = getInput(in, "Username");
+        String password = getInput(in, "Password");
         try {
             authToken = server.login(username, password).authToken();
             this.username = username;
@@ -267,39 +262,9 @@ public class Client {
     }
 
     private boolean registerGetArgs(Scanner in) {
-        String username;
-        String password;
-        String email;
-        while (true) {
-            System.out.print("Username: ");
-            username = in.nextLine();
-            if (username.contains(" ")) {
-                printError("Username must be one word.");
-            }
-            else {
-                break;
-            }
-        }
-        while (true) {
-            System.out.print("Password: ");
-            password = in.nextLine();
-            if (password.contains(" ")) {
-                printError("Password must be one word.");
-            }
-            else {
-                break;
-            }
-        }
-        while (true) {
-            System.out.print("Email: ");
-            email = in.nextLine();
-            if (email.contains(" ")) {
-                printError("Email may not contain spaces.");
-            }
-            else {
-                break;
-            }
-        }
+        String username = getInput(in, "Username");
+        String password = getInput(in, "Password");
+        String email = getInput(in, "Email");
         try {
             authToken = server.register(username, password, email).authToken();
             this.username = username;
@@ -339,11 +304,11 @@ public class Client {
         }
     }
 
-    private void joinArgsProvided(String idString, String teamString) {
+    private int joinObserveCommon(String idString) {
         if (games == null) {
             System.out.println("You must first list the games with "+ EscapeSequences.SET_TEXT_COLOR_BLUE
                     + "list" + EscapeSequences.RESET_TEXT_COLOR);
-            return;
+            return -1;
         }
         int id;
         try {
@@ -351,9 +316,17 @@ public class Client {
         }
         catch (NumberFormatException e) {
             printError("Please proved a numerical ID.");
+            return -1;
+        }
+        return id;
+    }
+
+    private void joinArgsProvided(String idString, String teamString) {
+        int id = joinObserveCommon(idString);
+        if (id < 0) {
             return;
         }
-        if (id <= 0 || id > games.length) {
+        if (id == 0 || id > games.length) {
             printError("Game ID must correspond to an existing game.");
             return;
         }
@@ -428,21 +401,14 @@ public class Client {
     }
 
     private void observeArgsProvided(String idString) {
-        if (games == null) {
-            System.out.println("You must first list the games with "+ EscapeSequences.SET_TEXT_COLOR_BLUE
-                    + "list" + EscapeSequences.RESET_TEXT_COLOR);
+        int id = joinObserveCommon(idString);
+        if (id < 0) {
             return;
         }
-
-        int id;
-        try {
-            id = Integer.parseInt(idString);
-        }
-        catch (NumberFormatException e) {
-            printError("Please proved a numerical ID.");
+        else if (id == 0 || id > games.length) {
+            printError("Game ID must correspond to an existing game.");
             return;
         }
-
         print(games[id-1].game().getBoard());
     }
 
@@ -474,20 +440,7 @@ public class Client {
         for (int i = 7; i >= 0; i--) {
             System.out.print(" " + (i+1) + " ");
             for (int j = 0; j < 8; j++) {
-                if (j % 2 != i % 2) {
-                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                }
-                else {
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
-                }
-                ChessPiece piece = pieces[i][j];
-                if (piece == null) {
-                    System.out.print(EscapeSequences.EMPTY);
-                    continue;
-                }
-
-                String pieceString = getPieceString(piece);
-                System.out.print(pieceString + EscapeSequences.RESET_TEXT_COLOR);
+                printCell(pieces, i, j);
             }
             System.out.print(EscapeSequences.RESET_BG_COLOR);
             System.out.print(" " + (i+1) + " ");
@@ -509,20 +462,7 @@ public class Client {
         for (int i = 0; i < 8; i++) {
             System.out.print(" " + (i+1) + " ");
             for (int j = 7; j >= 0; j--) {
-                if (j % 2 != i % 2) {
-                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                }
-                else {
-                    System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
-                }
-                ChessPiece piece = pieces[i][j];
-                if (piece == null) {
-                    System.out.print(EscapeSequences.EMPTY);
-                    continue;
-                }
-
-                String pieceString = getPieceString(piece);
-                System.out.print(pieceString + EscapeSequences.RESET_TEXT_COLOR);
+                printCell(pieces, i, j);
             }
             System.out.print(EscapeSequences.RESET_BG_COLOR);
             System.out.print(" " + (i+1) + " ");
@@ -533,6 +473,23 @@ public class Client {
             System.out.print(" " + Character.toString('ｈ' - i) + " ");
         }
         System.out.println("   " + EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
+    }
+
+    private void printCell(ChessPiece[][] pieces, int i, int j) {
+        if (j % 2 != i % 2) {
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+        }
+        else {
+            System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
+        }
+        ChessPiece piece = pieces[i][j];
+        if (piece == null) {
+            System.out.print(EscapeSequences.EMPTY);
+            return;
+        }
+
+        String pieceString = getPieceString(piece);
+        System.out.print(pieceString + EscapeSequences.RESET_TEXT_COLOR);
     }
 
     private String getPieceString(ChessPiece piece) {

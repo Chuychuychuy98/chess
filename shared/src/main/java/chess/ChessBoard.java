@@ -189,17 +189,24 @@ public class ChessBoard {
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                ChessPiece attacker = pieces[i][j];
-                if (attacker != null && attacker.getTeamColor() != team) {
-                    for (ChessMove move : attacker.pieceMoves(this, ChessPosition.getPosition(i+1,j+1))) {
-                        if (move.getEndPosition().equals(kingPos)) {
-                            return true;
-                        }
-                    }
+                if (isSpaceAttackingKing(i, j, team, kingPos)) {
+                    return true;
                 }
             }
         }
 
+        return false;
+    }
+
+    public boolean isSpaceAttackingKing(int row, int col, ChessGame.TeamColor team, ChessPosition kingPos) {
+        ChessPiece attacker = pieces[row][col];
+        if (attacker != null && attacker.getTeamColor() != team) {
+            for (ChessMove move : attacker.pieceMoves(this, ChessPosition.getPosition(row+1,col+1))) {
+                if (move.getEndPosition().equals(kingPos)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
