@@ -1,3 +1,5 @@
+package client;
+
 import chess.ChessGame;
 import exceptions.ResponseException;
 import model.GameData;
