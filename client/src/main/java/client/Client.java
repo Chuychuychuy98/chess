@@ -352,7 +352,6 @@ public class Client {
             return;
         }
 
-        System.out.print("Game ID: ");
         int id = getId(in);
 
         try {
