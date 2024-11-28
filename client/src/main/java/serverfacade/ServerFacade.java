@@ -20,6 +20,10 @@ public class ServerFacade {
         this.serverUrl = serverUrl;
     }
 
+    public String getUrl() {
+        return this.serverUrl;
+    }
+
     public void clear() throws ResponseException {
         this.makeRequest("DELETE", "/db", null, null, null);
 
