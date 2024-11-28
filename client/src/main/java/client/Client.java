@@ -5,6 +5,10 @@ import exceptions.ResponseException;
 import model.GameData;
 import serverfacade.ServerFacade;
 import ui.EscapeSequences;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 
@@ -390,5 +394,11 @@ public class Client {
         printBoard(games[id-1].game().getBoard());
     }
 
-
+    public void notify(ServerMessage msg) {
+        switch (msg.getServerMessageType()) {
+            case NOTIFICATION -> displayNotification(((NotificationMessage) msg).getMessage());
+            case ERROR -> printError(((ErrorMessage) msg).getMessage());
+            case LOAD_GAME -> loadGame(((LoadGameMessage) msg).getGame());
+        }
+    }
 }

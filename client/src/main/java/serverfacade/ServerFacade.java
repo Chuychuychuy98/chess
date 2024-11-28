@@ -1,6 +1,7 @@
 package serverfacade;
 
 import chess.ChessGame;
+import client.Client;
 import com.google.gson.Gson;
 import exceptions.ResponseException;
 import request.CreateGameRequest;
@@ -9,19 +10,46 @@ import request.LoginRequest;
 import request.RegisterRequest;
 import result.AuthTokenResult;
 import result.ListResult;
+import websocket.messages.ErrorMessage;
+import websocket.messages.ServerMessage;
 
+import javax.websocket.*;
 import java.io.*;
 import java.net.*;
 
-public class ServerFacade {
+public class ServerFacade extends Endpoint {
 
     private final String serverUrl;
-    public ServerFacade(String serverUrl) {
+    private final Client client;
+    private Session session = null;
+
+    public ServerFacade(String serverUrl, Client client) {
         this.serverUrl = serverUrl;
+        this.client = client;
     }
 
-    public String getUrl() {
-        return this.serverUrl;
+    @Override
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
+
+    }
+
+    public void webSocketConnect() throws URISyntaxException, DeploymentException, IOException {
+        URI uri = new URI("ws://" + serverUrl + "/ws");
+        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+        this.session = container.connectToServer(this, uri);
+        this.session.addMessageHandler((MessageHandler.Whole<String>) s -> {
+            try {
+                ServerMessage msg = new Gson().fromJson(s, ServerMessage.class);
+                client.notify(msg);
+            }
+            catch (Exception e) {
+                client.notify(new ErrorMessage(e.getMessage()));
+            }
+        });
+    }
+
+    public void send(String msg) throws IOException {
+        this.session.getBasicRemote().sendText(msg);
     }
 
     public void clear() throws ResponseException {
