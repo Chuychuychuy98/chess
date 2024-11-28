@@ -1,14 +1,14 @@
 package websocket.messages;
 
 public class NotificationMessage extends ServerMessage {
-    private final String msg;
+    private final String message;
 
-    public NotificationMessage(String msg) {
+    public NotificationMessage(String message) {
         super(ServerMessageType.NOTIFICATION);
-        this.msg = msg;
+        this.message = message;
     }
 
     public String getMessage() {
-        return msg;
+        return message;
     }
 }
