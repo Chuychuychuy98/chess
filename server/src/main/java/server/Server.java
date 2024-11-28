@@ -3,12 +3,16 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import exceptions.*;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import request.*;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
 import spark.*;
 
+@WebSocket
 public class Server {
 
     private final ClearService clearService;
@@ -65,6 +69,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
+        Spark.webSocket("ws", Server.class);
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
@@ -89,6 +94,34 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
+    }
+
+    @OnWebSocketMessage
+    public void onMessage(Session session, String msg) throws Exception {
+        System.out.printf("Received: %s", msg);
+        session.getRemote().sendString("Websocket response: " + msg);
+        /*
+        try {
+            UserGameCommand cmd = Serializer.fromJson(msg, UserGameCommand.class);
+
+            String username = getUsername(cmd.getAuthString());
+
+            saveSession(cmd.getGameId(), session);
+            switch (cmd.getCommandType()) {
+                case CONNECT -> connect(session, username, (ConnectCommand)cmd);
+                case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand)cmd);
+                case LEAVE -> leave(session, username, (LeaveCommand)cmd);
+                case RESIGN -> resign(session, username, (ResignCommand)cmd);
+            }
+        }
+        catch (UnauthorizedException e) {
+            sendMessage(session.getRemote(), new ErrorMessage("Error: unauthorized");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            sendMessage(session.getRemote(), new ErrorMessage("Error: " + e.getMessage());
+        }
+         */
     }
 
     private String formatError(String msg) {
