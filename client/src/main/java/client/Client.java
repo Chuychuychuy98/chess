@@ -10,6 +10,8 @@ import java.util.Scanner;
 
 import static client.Utils.printBoard;
 import static client.Utils.printError;
+import static client.Utils.printBoard;
+import static client.Utils.getId;
 
 public class Client {
     String authToken = null;
@@ -352,7 +354,7 @@ public class Client {
             return;
         }
 
-        int id = getId(in);
+        int id = getId(in, games);
 
         try {
             ChessGame.TeamColor team;
@@ -383,23 +385,6 @@ public class Client {
         }
     }
 
-    private int getId(Scanner in) {
-        int id = 0;
-        System.out.print("Game ID: ");
-        while (id <= 0 || id > games.length) {
-            String line = in.nextLine();
-            try {
-                id = Integer.parseInt(line);
-            } catch (NumberFormatException e) {
-                printError("Please input a single integer game ID.");
-            }
-            if (id <= 0 || id > games.length) {
-                printError("Please input a value corresponding to an existing game.");
-            }
-        }
-        return id;
-    }
-
     private void observeArgsProvided(String idString) {
         int id = joinObserveCommon(idString);
         if (id < 0) {
@@ -418,7 +403,7 @@ public class Client {
                     + "list" + EscapeSequences.RESET_TEXT_COLOR);
             return;
         }
-        int id = getId(in);
+        int id = getId(in, games);
         printBoard(games[id-1].game().getBoard());
     }
 

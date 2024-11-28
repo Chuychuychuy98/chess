@@ -3,7 +3,10 @@ package client;
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
+import model.GameData;
 import ui.EscapeSequences;
+
+import java.util.Scanner;
 
 public class Utils {
 
@@ -102,5 +105,22 @@ public class Utils {
                     };
         }
         return pieceString;
+    }
+
+    public static int getId(Scanner in, GameData[] games) {
+        int id = 0;
+        System.out.print("Game ID: ");
+        while (id <= 0 || id > games.length) {
+            String line = in.nextLine();
+            try {
+                id = Integer.parseInt(line);
+            } catch (NumberFormatException e) {
+                printError("Please input a single integer game ID.");
+            }
+            if (id <= 0 || id > games.length) {
+                printError("Please input a value corresponding to an existing game.");
+            }
+        }
+        return id;
     }
 }
