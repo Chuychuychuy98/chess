@@ -19,6 +19,7 @@ public class Client {
     private String username = null;
     private ServerFacade server;
     private GameData[] games = null;
+    private ChessGame.TeamColor color = null;
 
     public void setServer(ServerFacade server) {
         this.server = server;
@@ -144,7 +145,9 @@ public class Client {
                         joinGetArgs(in);
                     }
                     else {
-                        joinArgsProvided(args[1], args[2]);
+                        if (joinArgsProvided(args[1], args[2])) {
+                            inGame(in);
+                        }
                     }
                     break;
                 case "observe":
@@ -311,34 +314,37 @@ public class Client {
         return id;
     }
 
-    private void joinArgsProvided(String idString, String teamString) {
+    private boolean joinArgsProvided(String idString, String teamString) {
         int id = joinObserveCommon(idString);
         if (id < 0) {
-            return;
+            return false;
         }
         if (id == 0 || id > games.length) {
             printError("Game ID must correspond to an existing game.");
-            return;
+            return false;
         }
         if (!teamString.equals("white") && !teamString.equals("black")) {
             printError("Team color must be WHITE or BLACK.");
-            return;
+            return false;
         }
 
         try {
             server.join(id, teamString.equals("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, authToken);
-            printBoard(games[id-1].game().getBoard());
+            color = ChessGame.TeamColor.valueOf(teamString);
+            return true;
+//            printBoard(games[id-1].game().getBoard());
         }
         catch (ResponseException e) {
             printError(e.getMessage());
+            return false;
         }
     }
 
-    private void joinGetArgs(Scanner in) {
+    private boolean joinGetArgs(Scanner in) {
         if (games == null) {
             System.out.println("You must first list the games with "+ EscapeSequences.SET_TEXT_COLOR_BLUE
                     + "list" + EscapeSequences.RESET_TEXT_COLOR);
-            return;
+            return false;
         }
 
         int id = getId(in, games);
@@ -365,40 +371,51 @@ public class Client {
                 }
             }
             server.join(games[id-1].gameID(), team, authToken);
-            printBoard(games[id-1].game().getBoard());
+            color = team;
+            return true;
+            //printBoard(games[id-1].game().getBoard());
         }
         catch (ResponseException e) {
             printError(e.getMessage());
+            return false;
         }
     }
 
-    private void observeArgsProvided(String idString) {
+    private boolean observeArgsProvided(String idString) {
         int id = joinObserveCommon(idString);
         if (id < 0) {
-            return;
+            return false;
         }
         else if (id == 0 || id > games.length) {
             printError("Game ID must correspond to an existing game.");
-            return;
+            return false;
         }
-        printBoard(games[id-1].game().getBoard());
+        server.observe(authToken, games[id-1].gameID());
+        return true;
+        //printBlackTop(server.observe(games[id-1].gameID()).game().getBoard().getPieces());
+        //printBoard(games[id-1].game().getBoard());
     }
 
-    private void observeGetArgs(Scanner in) {
+    private boolean observeGetArgs(Scanner in) {
         if (games == null) {
             System.out.println("You must first list the games with "+ EscapeSequences.SET_TEXT_COLOR_BLUE
                     + "list" + EscapeSequences.RESET_TEXT_COLOR);
-            return;
+            return false;
         }
         int id = getId(in, games);
-        printBoard(games[id-1].game().getBoard());
+        server.observe(authToken, games[id-1].gameID());
+        return true;
+        //printBoard(games[id-1].game().getBoard());
     }
 
     public void notify(ServerMessage msg) {
         switch (msg.getServerMessageType()) {
             case NOTIFICATION -> displayNotification(((NotificationMessage) msg).getMessage());
             case ERROR -> printError(((ErrorMessage) msg).getMessage());
-            case LOAD_GAME -> loadGame(((LoadGameMessage) msg).getGame());
+            case LOAD_GAME -> {
+                //this.currentGame = ((LoadGameMessage) msg).getGame();
+                loadGame(((LoadGameMessage) msg).getGame());
+            }
         }
     }
 }
