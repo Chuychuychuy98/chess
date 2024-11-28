@@ -15,6 +15,8 @@ import spark.*;
 @WebSocket
 public class Server {
 
+    private final ConnectionManager connections = new ConnectionManager();
+
     private final ClearService clearService;
     private final GameService gameService;
     private final UserService userService;
