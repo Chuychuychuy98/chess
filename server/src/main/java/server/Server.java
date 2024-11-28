@@ -1,6 +1,9 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import dataaccess.*;
 import exceptions.*;
 import org.eclipse.jetty.websocket.api.Session;
@@ -11,15 +14,27 @@ import service.ClearService;
 import service.GameService;
 import service.UserService;
 import spark.*;
+import websocket.commands.*;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
+
+import java.io.IOException;
 
 @WebSocket
 public class Server {
 
     private final ConnectionManager connections = new ConnectionManager();
+    private final Gson serializer;
 
     private final ClearService clearService;
     private final GameService gameService;
     private final UserService userService;
+
+    private final AuthDAO authDAO;
+    private final GameDAO gameDAO;
+    private final UserDAO userDAO;
 
     String[] createStatements = {
             """
@@ -55,14 +70,29 @@ public class Server {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-        AuthDAO authDAO = new DatabaseAuthDAO();
-        GameDAO gameDAO = new DatabaseGameDAO();
-        UserDAO userDAO = new DatabaseUserDAO();
+        authDAO = new DatabaseAuthDAO();
+        gameDAO = new DatabaseGameDAO();
+        userDAO = new DatabaseUserDAO();
 
 
         clearService = new ClearService(authDAO, gameDAO, userDAO);
         gameService = new GameService(gameDAO, authDAO);
         userService = new UserService(userDAO, authDAO);
+
+        this.serializer = new GsonBuilder().registerTypeAdapter(UserGameCommand.class,
+                (JsonDeserializer<UserGameCommand>) (el, type, ctx) -> {
+                    UserGameCommand cmd = null;
+                    if (el.isJsonObject()) {
+                        String msgType = el.getAsJsonObject().get("commandType").getAsString();
+                        cmd = switch (UserGameCommand.CommandType.valueOf(msgType)) {
+                            case CONNECT -> ctx.deserialize(el, ConnectCommand.class);
+                            case MAKE_MOVE -> ctx.deserialize(el, MakeMoveCommand.class);
+                            case LEAVE -> ctx.deserialize(el, LeaveCommand.class);
+                            case RESIGN -> ctx.deserialize(el, ResignCommand.class);
+                        };
+                    }
+                    return cmd;
+                }).create();
     }
 
     public int run(int desiredPort) {
@@ -71,7 +101,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-        Spark.webSocket("ws", Server.class);
+        Spark.webSocket("/ws", Server.class);
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
@@ -99,31 +129,56 @@ public class Server {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String msg) throws Exception {
-        System.out.printf("Received: %s", msg);
-        session.getRemote().sendString("Websocket response: " + msg);
-        /*
+    public void onMessage(Session session, String msg) {
         try {
-            UserGameCommand cmd = Serializer.fromJson(msg, UserGameCommand.class);
+            UserGameCommand cmd = serializer.fromJson(msg, UserGameCommand.class);
 
-            String username = getUsername(cmd.getAuthString());
-
-            saveSession(cmd.getGameId(), session);
+            String username = authDAO.getAuth(cmd.getAuthToken()).username();
+            int gameID = cmd.getGameID();
+            saveSession(gameID, username, session);
             switch (cmd.getCommandType()) {
-                case CONNECT -> connect(session, username, (ConnectCommand)cmd);
-                case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand)cmd);
-                case LEAVE -> leave(session, username, (LeaveCommand)cmd);
-                case RESIGN -> resign(session, username, (ResignCommand)cmd);
+                case CONNECT -> connect(session, username, gameID, ((ConnectCommand)cmd).getColor());
+                default -> send(session, new ErrorMessage("Message type not yet implemented."));
+//                case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand)cmd);
+//                case LEAVE -> leave(session, username, (LeaveCommand)cmd);
+//                case RESIGN -> resign(session, username, (ResignCommand)cmd);
             }
         }
         catch (UnauthorizedException e) {
-            sendMessage(session.getRemote(), new ErrorMessage("Error: unauthorized");
+            send(session, new ErrorMessage("unauthorized"));
         }
         catch (Exception e) {
             e.printStackTrace();
-            sendMessage(session.getRemote(), new ErrorMessage("Error: " + e.getMessage());
+            send(session, new ErrorMessage(e.getMessage()));
         }
-         */
+    }
+
+    private void connect(Session session, String username, int gameID, ChessGame.TeamColor color) throws IOException, DataAccessException {
+        try {
+            send(session, new LoadGameMessage(gameDAO.getGame(gameID).serializedGame()));
+            if (color == null) {
+                connections.broadcast(gameID, new NotificationMessage(username + " is now observing!"), username);
+
+            }
+            else {
+                connections.broadcast(gameID,
+                        new NotificationMessage(username + " has joined as " + color + "!"), username);
+            }
+        } catch (EntryNotFoundException e) {
+            send(session, new ErrorMessage("No game with ID " + gameID + " exists."));
+        }
+    }
+
+    private void saveSession(int gameID, String username, Session session) {
+        connections.add(gameID, username, session);
+    }
+
+    private void send(Session session, ServerMessage msg) {
+        try {
+            session.getRemote().sendString(new Gson().toJson(msg));
+        } catch (IOException e) {
+            System.out.printf("Could not send message to client.%nMessage: %s%n", new Gson().toJson(msg));
+        }
     }
 
     private String formatError(String msg) {
