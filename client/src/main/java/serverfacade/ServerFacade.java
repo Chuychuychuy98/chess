@@ -20,12 +20,12 @@ import java.net.*;
 public class ServerFacade extends Endpoint {
 
     private final String serverUrl;
-    private final Client client;
     private Session session = null;
+    private final Client observer;
 
-    public ServerFacade(String serverUrl, Client client) {
+    public ServerFacade(String serverUrl, Client observer) {
         this.serverUrl = serverUrl;
-        this.client = client;
+        this.observer = observer;
     }
 
     @Override
@@ -40,10 +40,10 @@ public class ServerFacade extends Endpoint {
         this.session.addMessageHandler((MessageHandler.Whole<String>) s -> {
             try {
                 ServerMessage msg = new Gson().fromJson(s, ServerMessage.class);
-                client.notify(msg);
+                observer.notify(msg);
             }
             catch (Exception e) {
-                client.notify(new ErrorMessage(e.getMessage()));
+                observer.notify(new ErrorMessage(e.getMessage()));
             }
         });
     }

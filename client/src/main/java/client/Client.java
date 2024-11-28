@@ -17,10 +17,10 @@ import static client.Utils.*;
 public class Client {
     private String authToken = null;
     private String username = null;
-    private final ServerFacade server;
+    private ServerFacade server;
     private GameData[] games = null;
 
-    public Client(ServerFacade server) {
+    public void setServer(ServerFacade server) {
         this.server = server;
     }
 

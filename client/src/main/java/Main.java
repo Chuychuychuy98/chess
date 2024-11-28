@@ -20,7 +20,8 @@ public class Main {
             System.out.println("Usage: chess [server name] [port]");
             return;
         }
-        Client client = new Client(new ServerFacade(url));
+        Client client = new Client();
+        client.setServer(new ServerFacade(url, client));
         client.start();
     }
 
