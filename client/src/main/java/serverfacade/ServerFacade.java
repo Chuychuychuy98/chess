@@ -3,6 +3,8 @@ package serverfacade;
 import chess.ChessGame;
 import client.Client;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import exceptions.ResponseException;
 import request.CreateGameRequest;
 import request.JoinRequest;
@@ -10,7 +12,11 @@ import request.LoginRequest;
 import request.RegisterRequest;
 import result.AuthTokenResult;
 import result.ListResult;
+import websocket.commands.ConnectCommand;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
@@ -22,10 +28,25 @@ public class ServerFacade extends Endpoint {
     private final String serverUrl;
     private Session session = null;
     private final Client observer;
+    private final Gson serializer;
 
     public ServerFacade(String serverUrl, Client observer) {
         this.serverUrl = serverUrl;
         this.observer = observer;
+
+        this.serializer = new GsonBuilder().registerTypeAdapter(ServerMessage.class,
+                (JsonDeserializer<ServerMessage>) (el, type, ctx) -> {
+                    ServerMessage msg = null;
+                    if (el.isJsonObject()) {
+                        String msgType = el.getAsJsonObject().get("type").getAsString();
+                        msg = switch (ServerMessage.ServerMessageType.valueOf(msgType)) {
+                            case NOTIFICATION -> ctx.deserialize(el, NotificationMessage.class);
+                            case ERROR -> ctx.deserialize(el, ErrorMessage.class);
+                            case LOAD_GAME -> ctx.deserialize(el, LoadGameMessage.class);
+                        };
+                    }
+                    return msg;
+                }).create();
     }
 
     @Override
@@ -33,23 +54,35 @@ public class ServerFacade extends Endpoint {
 
     }
 
-    public void webSocketConnect() throws URISyntaxException, DeploymentException, IOException {
+    private void webSocketConnect() throws URISyntaxException, DeploymentException, IOException {
         URI uri = new URI("ws://" + serverUrl + "/ws");
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, uri);
-        this.session.addMessageHandler((MessageHandler.Whole<String>) s -> {
-            try {
-                ServerMessage msg = new Gson().fromJson(s, ServerMessage.class);
-                observer.notify(msg);
-            }
-            catch (Exception e) {
-                observer.notify(new ErrorMessage(e.getMessage()));
+        this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+            public void onMessage(String msg) {
+                try {
+                    ServerMessage serverMsg = serializer.fromJson(msg, ServerMessage.class);
+                    observer.notify(serverMsg);
+                } catch (Exception e) {
+                    observer.notify(new ErrorMessage(e.getMessage()));
+                }
             }
         });
     }
 
-    public void send(String msg) throws IOException {
-        this.session.getBasicRemote().sendText(msg);
+    public void observe(String authToken, int id) {
+        try {
+            if (session == null) {
+                webSocketConnect();
+            }
+            send(new ConnectCommand(authToken, id));
+        } catch (Exception e) {
+            observer.notify(new ErrorMessage(e.getMessage()));
+        }
+    }
+
+    public void send(UserGameCommand msg) throws IOException {
+        this.session.getBasicRemote().sendText(new Gson().toJson(msg));
     }
 
     public void clear() throws ResponseException {
@@ -81,6 +114,7 @@ public class ServerFacade extends Endpoint {
 
     public void join(int gameID, ChessGame.TeamColor team, String authToken) throws ResponseException {
         this.makeRequest("PUT", "/game", new JoinRequest(team, gameID), authToken, null);
+        this.observe(authToken, gameID);
     }
 
     private <T> T makeRequest(String method, String path, Object request, String authToken, Class<T> responseClass) throws ResponseException {
