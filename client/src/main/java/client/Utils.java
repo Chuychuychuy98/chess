@@ -123,4 +123,18 @@ public class Utils {
         }
         return id;
     }
+
+    public static String getInput(Scanner in, String prompt) {
+        String input;
+        while (true) {
+            System.out.print(prompt + ": ");
+            input = in.nextLine();
+            if (input.contains(" ")) {
+                printError(prompt + " must not contain spaces.");
+            }
+            else {
+                return input;
+            }
+        }
+    }
 }

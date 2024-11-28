@@ -8,10 +8,7 @@ import ui.EscapeSequences;
 
 import java.util.Scanner;
 
-import static client.Utils.printBoard;
-import static client.Utils.printError;
-import static client.Utils.printBoard;
-import static client.Utils.getId;
+import static client.Utils.*;
 
 public class Client {
     String authToken = null;
@@ -190,20 +187,6 @@ public class Client {
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "help"
                 + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - print this help message");
         System.out.print(EscapeSequences.RESET_TEXT_COLOR);
-    }
-
-    private String getInput(Scanner in, String prompt) {
-        String input;
-        while (true) {
-            System.out.print(prompt + ": ");
-            input = in.nextLine();
-            if (input.contains(" ")) {
-                printError(prompt + " must not contain spaces.");
-            }
-            else {
-                return input;
-            }
-        }
     }
 
     private boolean loginGetArgs(Scanner in) {
