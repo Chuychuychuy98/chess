@@ -27,7 +27,7 @@ public class Utils {
         printBlackTop(board.getPieces());
     }
 
-    private static void printBlackTop(ChessPiece[][] pieces) {
+    public static void printBlackTop(ChessPiece[][] pieces) {
         System.out.print("   ");
         for (int i = 0; i < 8; i++) {
             System.out.print(" " + Character.toString('ａ' + i) + " ");
@@ -49,7 +49,7 @@ public class Utils {
         System.out.println("   " + EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
     }
 
-    private static void printWhiteTop(ChessPiece[][] pieces) {
+    public static void printWhiteTop(ChessPiece[][] pieces) {
         System.out.print("   ");
         for (int i = 0; i < 8; i++) {
             System.out.print(" " + Character.toString('ｈ' - i) + " ");
