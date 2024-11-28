@@ -15,10 +15,10 @@ import java.util.Scanner;
 import static client.Utils.*;
 
 public class Client {
-    String authToken = null;
-    String username = null;
-    ServerFacade server;
-    GameData[] games = null;
+    private String authToken = null;
+    private String username = null;
+    private final ServerFacade server;
+    private GameData[] games = null;
 
     public Client(ServerFacade server) {
         this.server = server;
