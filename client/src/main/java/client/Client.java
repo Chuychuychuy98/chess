@@ -142,7 +142,9 @@ public class Client {
                         printError("Missing team color.");
                     }
                     else if (args.length == 1) {
-                        joinGetArgs(in);
+                        if (joinGetArgs(in)) {
+                            inGame(in);
+                        }
                     }
                     else {
                         if (joinArgsProvided(args[1], args[2])) {
@@ -156,11 +158,30 @@ public class Client {
                                 EscapeSequences.SET_TEXT_COLOR_RED + " takes only an ID");
                     }
                     else if (args.length == 1){
-                        observeGetArgs(in);
+                        if (observeGetArgs(in)) {
+                            inGame(in);
+                        }
                     }
                     else {
-                        observeArgsProvided(args[1]);
+                        if (observeArgsProvided(args[1])) {
+                            inGame(in);
+                        }
                     }
+                    break;
+                default:
+                    System.out.println("Unrecognized command. For a list of available commands, type \"help\"");
+            }
+        }
+    }
+
+    private void inGame(Scanner in) {
+        while (true) {
+            System.out.printf("[%s] >>> ", username);
+            String userInput = in.nextLine();
+            String[] args = userInput.split(" +");
+            switch (args[0].toLowerCase()) {
+                case "help":
+                    helpInGame();
                     break;
                 default:
                     System.out.println("Unrecognized command. For a list of available commands, type \"help\"");
@@ -191,6 +212,23 @@ public class Client {
                 + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - join a game");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "observe <ID>"
                 + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - observe a game");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "help"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - print this help message");
+        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
+    }
+
+    private void helpInGame() {
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "redraw"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - redraw the board");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "leave"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - leave the match");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "move <from> <to>"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - make a move");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "resign"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - concede the match");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "highlight" + EscapeSequences.RESET_TEXT_COLOR + "or"
+                + EscapeSequences.SET_TEXT_COLOR_BLUE + "moves"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - highlight legal moves in green");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "help"
                 + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - print this help message");
         System.out.print(EscapeSequences.RESET_TEXT_COLOR);
