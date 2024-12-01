@@ -138,10 +138,10 @@ public class Server {
             saveSession(gameID, username, session);
             switch (cmd.getCommandType()) {
                 case CONNECT -> connect(session, username, gameID, ((ConnectCommand)cmd).getColor());
-                default -> send(session, new ErrorMessage("Message type not yet implemented."));
 //                case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand)cmd);
-//                case LEAVE -> leave(session, username, (LeaveCommand)cmd);
+                case LEAVE -> leave(session, username, gameID);
 //                case RESIGN -> resign(session, username, (ResignCommand)cmd);
+                default -> send(session, new ErrorMessage("Message type not yet implemented."));
             }
         }
         catch (UnauthorizedException e) {
@@ -153,7 +153,8 @@ public class Server {
         }
     }
 
-    private void connect(Session session, String username, int gameID, ChessGame.TeamColor color) throws IOException, DataAccessException {
+    private void connect(Session session, String username, int gameID, ChessGame.TeamColor color)
+            throws IOException, DataAccessException {
         try {
             send(session, new LoadGameMessage(gameDAO.getGame(gameID).serializedGame()));
             if (color == null) {
@@ -165,6 +166,16 @@ public class Server {
                         new NotificationMessage(username + " has joined as " + color + "!"), username);
             }
         } catch (EntryNotFoundException e) {
+            send(session, new ErrorMessage("No game with ID " + gameID + " exists."));
+        }
+    }
+
+    private void leave(Session session, String username, int gameID) throws IOException, DataAccessException {
+        try {
+            gameDAO.playerLeave(gameID, username);
+            connections.broadcast(gameID, new NotificationMessage(username + " has left the match."), username);
+        }
+        catch (EntryNotFoundException e) {
             send(session, new ErrorMessage("No game with ID " + gameID + " exists."));
         }
     }

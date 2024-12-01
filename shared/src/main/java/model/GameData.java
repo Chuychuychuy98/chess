@@ -32,4 +32,16 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
     public String serializedGame() {
         return new Gson().toJson(game);
     }
+
+    public GameData removePlayer(String username) {
+        if (this.blackUsername.equals(username)) {
+            return new GameData(gameID, whiteUsername, null, gameName, game);
+        }
+        else if (this.whiteUsername.equals(username)) {
+            return new GameData(gameID, null, blackUsername, gameName, game);
+        }
+        else {
+            return this;
+        }
+    }
 }

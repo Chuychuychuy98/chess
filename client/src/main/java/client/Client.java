@@ -20,6 +20,7 @@ public class Client {
     private ServerFacade server;
     private GameData[] games = null;
     private ChessGame.TeamColor color = null;
+    private GameData curGame = null;
 
     public void setServer(ServerFacade server) {
         this.server = server;
@@ -182,6 +183,20 @@ public class Client {
             switch (args[0].toLowerCase()) {
                 case "help":
                     helpInGame();
+                    break;
+                case "redraw":
+                    System.out.print(EscapeSequences.ERASE_SCREEN);
+                    if (color == ChessGame.TeamColor.BLACK) {
+                        Utils.printWhiteTop(curGame.game().getBoard().getPieces());
+                    }
+                    else {
+                        Utils.printBlackTop(curGame.game().getBoard().getPieces());
+                    }
+                    break;
+                case "leave":
+                    if (server.leave(authToken, curGame.gameID())) {
+                        return;
+                    }
                     break;
                 default:
                     System.out.println("Unrecognized command. For a list of available commands, type \"help\"");
@@ -367,7 +382,8 @@ public class Client {
         }
 
         try {
-            server.join(id, teamString.equals("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, authToken);
+            curGame = games[id-1];
+            server.join(curGame.gameID(), teamString.equals("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, authToken);
             color = ChessGame.TeamColor.valueOf(teamString);
             return true;
 //            printBoard(games[id-1].game().getBoard());
@@ -408,7 +424,8 @@ public class Client {
                     }
                 }
             }
-            server.join(games[id-1].gameID(), team, authToken);
+            curGame = games[id-1];
+            server.join(curGame.gameID(), team, authToken);
             color = team;
             return true;
             //printBoard(games[id-1].game().getBoard());
@@ -428,7 +445,8 @@ public class Client {
             printError("Game ID must correspond to an existing game.");
             return false;
         }
-        server.observe(authToken, games[id-1].gameID());
+        curGame = games[id-1];
+        server.observe(authToken, curGame.gameID());
         return true;
         //printBlackTop(server.observe(games[id-1].gameID()).game().getBoard().getPieces());
         //printBoard(games[id-1].game().getBoard());
@@ -441,7 +459,8 @@ public class Client {
             return false;
         }
         int id = getId(in, games);
-        server.observe(authToken, games[id-1].gameID());
+        curGame = games[id-1];
+        server.observe(authToken, curGame.gameID());
         return true;
         //printBoard(games[id-1].game().getBoard());
     }

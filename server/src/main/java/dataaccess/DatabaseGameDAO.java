@@ -20,7 +20,7 @@ public class DatabaseGameDAO implements GameDAO {
             }
         }
         catch (SQLException ex) {
-            throw new DataAccessException("Error: could not connect to database");
+            throw new DataAccessException("Could not connect to database.");
         }
     }
 
@@ -67,7 +67,7 @@ public class DatabaseGameDAO implements GameDAO {
             }
         }
         catch (SQLException ex) {
-            throw new DataAccessException(String.format("Error: %s", ex.getMessage()));
+            throw new DataAccessException(ex.getMessage());
         }
     }
 
@@ -88,7 +88,7 @@ public class DatabaseGameDAO implements GameDAO {
                         rs.getString("game"));
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Error: %s", ex.getMessage()));
+            throw new DataAccessException(ex.getMessage());
         }
     }
 
@@ -110,7 +110,7 @@ public class DatabaseGameDAO implements GameDAO {
                 return games.toArray(new GameData[0]);
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Error: %s", ex.getMessage()));
+            throw new DataAccessException(ex.getMessage());
         }
     }
 
@@ -140,7 +140,42 @@ public class DatabaseGameDAO implements GameDAO {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Error: %s", ex.getMessage()));
+            throw new DataAccessException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public void playerLeave(int gameID, String username) throws DataAccessException, EntryNotFoundException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?")) {
+                ps.setInt(1, gameID);
+                ResultSet rs = ps.executeQuery();
+                if (!rs.next()) {
+                    throw new EntryNotFoundException(String.format("Game with id %d not found.", gameID));
+                }
+                GameData data = new GameData(
+                        rs.getInt("gameID"),
+                        rs.getString("whiteUsername"),
+                        rs.getString("blackUsername"),
+                        rs.getString("gameName"),
+                        rs.getString("game")
+                );
+                if (data.whiteUsername().equals(username)) {
+                    try (PreparedStatement update = conn.prepareStatement("UPDATE game SET whiteUsername=NULL WHERE gameID=?")) {
+                        update.setInt(1, gameID);
+                        update.executeUpdate();
+                    }
+                }
+                else if (data.blackUsername().equals(username)) {
+                    try (PreparedStatement update = conn.prepareStatement("UPDATE game SET blackUsername=NULL WHERE gameID=?")) {
+                        update.setInt(1, gameID);
+                        update.executeUpdate();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
         }
     }
 }

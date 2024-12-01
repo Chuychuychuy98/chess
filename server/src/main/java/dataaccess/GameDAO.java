@@ -48,4 +48,5 @@ public interface GameDAO {
      */
     void updateGame(int gameID, ChessGame.TeamColor color, String newUsername) throws DataAccessException, EntryNotFoundException;
 
+    void playerLeave(int gameID, String username) throws DataAccessException, EntryNotFoundException;
 }

@@ -13,6 +13,7 @@ import request.RegisterRequest;
 import result.AuthTokenResult;
 import result.ListResult;
 import websocket.commands.ConnectCommand;
+import websocket.commands.LeaveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -78,6 +79,17 @@ public class ServerFacade extends Endpoint {
             send(new ConnectCommand(authToken, id));
         } catch (Exception e) {
             observer.notify(new ErrorMessage(e.getMessage()));
+        }
+    }
+
+    public boolean leave(String authToken, int id) {
+        try {
+            send(new LeaveCommand(authToken, id));
+            return true;
+        }
+        catch (Exception e) {
+            observer.notify(new ErrorMessage(e.getMessage()));
+            return false;
         }
     }
 
