@@ -68,6 +68,6 @@ public class MemoryGameDAO implements GameDAO{
         if (data == null) {
             throw new EntryNotFoundException(String.format("Game with id %d not found.", gameID));
         }
-        database.put(data.gameID(), data.makeMove(move));
+        database.put(data.gameID(), data.makeMove(username, move));
     }
 }

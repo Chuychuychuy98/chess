@@ -1,8 +1,6 @@
 package server;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.InvalidMoveException;
+import chess.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
@@ -185,32 +183,41 @@ public class Server {
 
     private void makeMove(Session session, String username, int gameID, ChessMove move) throws IOException, DataAccessException {
         try {
-            gameDAO.makeMove(gameID, username, move);
             GameData game = gameDAO.getGame(gameID);
-            ChessGame.TeamColor opponentColor;
+            ChessGame.TeamColor color;
             String opponentName;
             if (game.whiteUsername().equals(username)) {
-                opponentColor = ChessGame.TeamColor.BLACK;
+                color = ChessGame.TeamColor.WHITE;
                 opponentName = game.blackUsername();
             }
             else  {
-                opponentColor = ChessGame.TeamColor.WHITE;
+                color = ChessGame.TeamColor.BLACK;
                 opponentName = game.whiteUsername();
             }
+            gameDAO.makeMove(gameID, username, move);
+            game = gameDAO.getGame(gameID);
+
             connections.broadcast(gameID, new LoadGameMessage(new Gson().toJson(game)));
             connections.broadcast(gameID, new NotificationMessage(username + " moved " +
                     move.getStartPosition() + " to " + move.getEndPosition() + "."), username);
-            if (game.game().isInCheck(opponentColor)) {
+            if (game.game().isInCheck(color.opposite())) {
                 connections.broadcast(gameID, new NotificationMessage(opponentName + " is now in check!"));
             }
-            else if (game.game().isInCheckmate(opponentColor)) {
+            else if (game.game().isInCheckmate(color.opposite())) {
                 connections.broadcast(gameID, new NotificationMessage(opponentName + " is now in checkmate!\nGAME OVER!"));
             }
-            else if (game.game().isInStalemate(opponentColor)) {
+            else if (game.game().isInStalemate(color.opposite())) {
                 connections.broadcast(gameID, new NotificationMessage("Stalemate!\nGAME OVER!"));
             }
         } catch (EntryNotFoundException e) {
             send(session, new ErrorMessage("No game with ID " + gameID + " exists."));
+        } catch (GameOverException e){
+            send(session, new ErrorMessage(e.getMessage()));
+        } catch (WrongTurnException e) {
+            send(session, new ErrorMessage("It is not your turn."));
+        } catch (NonexistentPlayerException e) {
+            send(session, new ErrorMessage("You are not currently playing this game. To join a game, type " +
+                    "\u001b[38;512mleave\u001b[38;5160m and join a new game"));
         } catch (InvalidMoveException e) {
             send(session, new ErrorMessage(e.getMessage() + "For a list of valid moves, try typing " +
                     "\u001b[38;512mmoves\u001b[38;5160m"));

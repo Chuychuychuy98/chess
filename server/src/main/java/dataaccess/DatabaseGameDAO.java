@@ -176,7 +176,7 @@ public class DatabaseGameDAO implements GameDAO {
             try (PreparedStatement ps = conn.prepareStatement(
                     "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?")) {
                 GameData data = getGame(gameID, ps);
-                data.makeMove(move);
+                data.makeMove(username, move);
                 try (PreparedStatement update = conn.prepareStatement("UPDATE game SET game=? WHERE gameID=?")) {
                     update.setString(1, data.serializedGame());
                     update.setInt(2, gameID);
@@ -187,6 +187,7 @@ public class DatabaseGameDAO implements GameDAO {
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
+
     }
 
     private GameData getGame(int gameID, PreparedStatement ps) throws SQLException, EntryNotFoundException {

@@ -1,8 +1,6 @@
 package model;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.InvalidMoveException;
+import chess.*;
 import com.google.gson.Gson;
 
 
@@ -47,7 +45,20 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
         }
     }
 
-    public GameData makeMove(ChessMove move) throws InvalidMoveException {
+    public GameData makeMove(String username, ChessMove move) throws NonexistentPlayerException, WrongTurnException, InvalidMoveException {
+        if (username.equals(blackUsername)) {
+            if (!game.getTeamTurn().equals(ChessGame.TeamColor.BLACK)) {
+                throw new WrongTurnException(username);
+            }
+        }
+        else if (username.equals(whiteUsername)) {
+            if (!game.getTeamTurn().equals(ChessGame.TeamColor.WHITE)) {
+                throw new WrongTurnException(username);
+            }
+        }
+        else {
+            throw new NonexistentPlayerException(username);
+        }
         game().makeMove(move);
         return this;
     }

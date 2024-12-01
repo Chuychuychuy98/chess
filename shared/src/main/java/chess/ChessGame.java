@@ -12,6 +12,7 @@ public class ChessGame {
 
     private TeamColor turn;
     private ChessBoard board;
+    private boolean over = false;
 
     public ChessGame() {
         turn = TeamColor.WHITE;
@@ -53,7 +54,16 @@ public class ChessGame {
      */
     public enum TeamColor {
         WHITE,
-        BLACK
+        BLACK;
+
+        public TeamColor opposite() {
+            if (this.equals(WHITE)) {
+                return BLACK;
+            }
+            else {
+                return WHITE;
+            }
+        }
     }
 
     /**
@@ -85,22 +95,34 @@ public class ChessGame {
     /**
      * Makes a move in a chess game
      *
-     * @param move chess move to preform
+     * @param move chess move to perform
      * @throws InvalidMoveException if move is invalid
+     * @throws WrongTurnException if the wrong player is trying to move
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (over) {
+            throw new GameOverException();
+        }
         Collection<ChessMove> moves = validMoves(move.getStartPosition());
-        if (moves != null && moves.contains(move) && board.getPiece(move.getStartPosition()).getTeamColor() == turn) {
-            board.doMove(move);
+        if (moves != null && moves.contains(move)) {
+            if (board.getPiece(move.getStartPosition()).getTeamColor() == turn) {
+                board.doMove(move);
+            }
+            else {
+                throw new WrongTurnException();
+            }
         }
         else {
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("You cannot move there.");
         }
         if (turn == TeamColor.WHITE) {
             turn = TeamColor.BLACK;
         }
         else {
             turn = TeamColor.WHITE;
+        }
+        if (isInStalemate(turn) || isInCheckmate(turn)) {
+            over = true;
         }
     }
 
@@ -170,6 +192,14 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    public boolean isOver() {
+        return over;
+    }
+
+    public void setGameOver() {
+        over = true;
     }
 
     @Override
