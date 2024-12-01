@@ -1,7 +1,7 @@
 package server;
 
 import org.eclipse.jetty.websocket.api.Session;
-import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -19,11 +19,11 @@ public class ConnectionManager {
         connections.forEach((gameID, set) -> set.removeIf(conn -> conn.username().equals(visitorName)));
     }
 
-    public void broadcast(int gameID, NotificationMessage notification) throws IOException {
+    public void broadcast(int gameID, ServerMessage notification) throws IOException {
         broadcast(gameID, notification, null);
     }
 
-    public void broadcast(int gameID, NotificationMessage notification, String excludeUsername) throws IOException {
+    public void broadcast(int gameID, ServerMessage notification, String excludeUsername) throws IOException {
         Set<Connection> removeSet = new HashSet<>();
         Set<Connection> connectionsByID = connections.get(gameID);
         for (Connection conn : connectionsByID) {

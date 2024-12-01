@@ -1,11 +1,14 @@
 package server;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import dataaccess.*;
 import exceptions.*;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -138,7 +141,7 @@ public class Server {
             saveSession(gameID, username, session);
             switch (cmd.getCommandType()) {
                 case CONNECT -> connect(session, username, gameID, ((ConnectCommand)cmd).getColor());
-//                case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand)cmd);
+                case MAKE_MOVE -> makeMove(session, username, gameID, ((MakeMoveCommand)cmd).getMove());
                 case LEAVE -> leave(session, username, gameID);
 //                case RESIGN -> resign(session, username, (ResignCommand)cmd);
                 default -> send(session, new ErrorMessage("Message type not yet implemented."));
@@ -177,6 +180,40 @@ public class Server {
         }
         catch (EntryNotFoundException e) {
             send(session, new ErrorMessage("No game with ID " + gameID + " exists."));
+        }
+    }
+
+    private void makeMove(Session session, String username, int gameID, ChessMove move) throws IOException, DataAccessException {
+        try {
+            gameDAO.makeMove(gameID, username, move);
+            GameData game = gameDAO.getGame(gameID);
+            ChessGame.TeamColor opponentColor;
+            String opponentName;
+            if (game.whiteUsername().equals(username)) {
+                opponentColor = ChessGame.TeamColor.BLACK;
+                opponentName = game.blackUsername();
+            }
+            else  {
+                opponentColor = ChessGame.TeamColor.WHITE;
+                opponentName = game.whiteUsername();
+            }
+            connections.broadcast(gameID, new LoadGameMessage(new Gson().toJson(game)));
+            connections.broadcast(gameID, new NotificationMessage(username + " moved " +
+                    move.getStartPosition() + " to " + move.getEndPosition() + "."), username);
+            if (game.game().isInCheck(opponentColor)) {
+                connections.broadcast(gameID, new NotificationMessage(opponentName + " is now in check!"));
+            }
+            else if (game.game().isInCheckmate(opponentColor)) {
+                connections.broadcast(gameID, new NotificationMessage(opponentName + " is now in checkmate!\nGAME OVER!"));
+            }
+            else if (game.game().isInStalemate(opponentColor)) {
+                connections.broadcast(gameID, new NotificationMessage("Stalemate!\nGAME OVER!"));
+            }
+        } catch (EntryNotFoundException e) {
+            send(session, new ErrorMessage("No game with ID " + gameID + " exists."));
+        } catch (InvalidMoveException e) {
+            send(session, new ErrorMessage(e.getMessage() + "For a list of valid moves, try typing " +
+                    "\u001b[38;512mmoves\u001b[38;5160m"));
         }
     }
 

@@ -1,6 +1,7 @@
 package serverfacade;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import client.Client;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -14,6 +15,7 @@ import result.AuthTokenResult;
 import result.ListResult;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -90,6 +92,15 @@ public class ServerFacade extends Endpoint {
         catch (Exception e) {
             observer.notify(new ErrorMessage(e.getMessage()));
             return false;
+        }
+    }
+
+    public void move(String authToken, int id, ChessMove move) {
+        try {
+            send(new MakeMoveCommand(authToken, id, move));
+        }
+        catch (Exception e) {
+            observer.notify(new ErrorMessage(e.getMessage()));
         }
     }
 

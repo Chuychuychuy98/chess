@@ -1,6 +1,8 @@
 package model;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 
 
@@ -43,5 +45,10 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
         else {
             return this;
         }
+    }
+
+    public GameData makeMove(ChessMove move) throws InvalidMoveException {
+        game().makeMove(move);
+        return this;
     }
 }

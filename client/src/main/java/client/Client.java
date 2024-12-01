@@ -1,6 +1,9 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import exceptions.ResponseException;
 import model.GameData;
 import serverfacade.ServerFacade;
@@ -182,7 +185,7 @@ public class Client {
             String[] args = userInput.split(" +");
             switch (args[0].toLowerCase()) {
                 case "help":
-                    helpInGame();
+                    Utils.helpInGame();
                     break;
                 case "redraw":
                     System.out.print(EscapeSequences.ERASE_SCREEN);
@@ -198,56 +201,27 @@ public class Client {
                         return;
                     }
                     break;
+                case "move":
+                    if (args.length > 3) {
+                        printError("Too many arguments given. " + EscapeSequences.SET_TEXT_COLOR_BLUE + "move" +
+                                EscapeSequences.SET_TEXT_COLOR_RED + " takes a square to move from and a square to move to.");
+                    }
+                    else if (args.length == 2) {
+                        printError("Missing destination square.");
+                    }
+                    else if (args.length == 1) {
+                        moveGetArgs(in);
+                    }
+                    else {
+                        moveArgsProvided(args[1], args[2], in);
+                    }
                 default:
                     System.out.println("Unrecognized command. For a list of available commands, type \"help\"");
             }
         }
     }
 
-    private void helpBeforeLogin() {
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "login <USERNAME> <PASSWORD>"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - create an account");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - log into your account to play chess");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "quit"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - exit the chess client");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "help"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - print this help message");
-        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
-    }
 
-    private void helpAfterLogin() {
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "logout"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - log out of your account");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "create <NAME>"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - create a game");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "list"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - list all games");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "join <ID> [WHITE|BLACK]"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - join a game");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "observe <ID>"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - observe a game");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "help"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - print this help message");
-        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
-    }
-
-    private void helpInGame() {
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "redraw"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - redraw the board");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "leave"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - leave the match");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "move <from> <to>"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - make a move");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "resign"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - concede the match");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "highlight" + EscapeSequences.RESET_TEXT_COLOR + "or"
-                + EscapeSequences.SET_TEXT_COLOR_BLUE + "moves"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - highlight legal moves in green");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "help"
-                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - print this help message");
-        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
-    }
 
     private boolean loginGetArgs(Scanner in) {
         String username = getInput(in, "Username");
@@ -463,6 +437,34 @@ public class Client {
         server.observe(authToken, curGame.gameID());
         return true;
         //printBoard(games[id-1].game().getBoard());
+    }
+
+    private void moveGetArgs(Scanner in) {
+        ChessPosition from = Utils.getSquare(in, "From");
+        ChessPosition to = Utils.getSquare(in, "To");
+
+        ChessPiece.PieceType promotionPiece = Utils.getPromotion(in,
+                curGame.game().getBoard().getPiece(from).getPieceType(), to.getRow(), color);
+        server.move(authToken, curGame.gameID(), new ChessMove(from, to, promotionPiece));
+    }
+
+    private void moveArgsProvided(String fromString, String toString, Scanner in) {
+        ChessPosition from = Utils.parsePosition(fromString);
+        if (from == null) {
+            printError("<From> string formatted incorrectly. A chess square is notated with a letter for the column" +
+                    " and a number for the row, as in \"a1\".");
+            return;
+        }
+        ChessPosition to = Utils.parsePosition(toString);
+        if (to == null) {
+            printError("<To> string formatted incorrectly. A chess square is notated with a letter for the column" +
+                    " and a number for the row, as in \"a1\".");
+            return;
+        }
+        ChessPiece.PieceType promotionPiece = Utils.getPromotion(in,
+                curGame.game().getBoard().getPiece(from).getPieceType(), to.getRow(), color);
+
+        server.move(authToken, curGame.gameID(), new ChessMove(from, to, promotionPiece));
     }
 
     public void notify(ServerMessage msg) {

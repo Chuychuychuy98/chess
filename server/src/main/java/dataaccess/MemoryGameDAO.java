@@ -1,6 +1,8 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import exceptions.DuplicateEntryException;
 import exceptions.EntryNotFoundException;
 import model.GameData;
@@ -58,5 +60,14 @@ public class MemoryGameDAO implements GameDAO{
             throw new EntryNotFoundException(String.format("Game with id %d not found.", gameID));
         }
         database.put(data.gameID(), data.removePlayer(username));
+    }
+
+    @Override
+    public void makeMove(int gameID, String username, ChessMove move) throws EntryNotFoundException, InvalidMoveException {
+        GameData data = database.get(gameID);
+        if (data == null) {
+            throw new EntryNotFoundException(String.format("Game with id %d not found.", gameID));
+        }
+        database.put(data.gameID(), data.makeMove(move));
     }
 }

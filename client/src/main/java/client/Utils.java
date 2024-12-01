@@ -3,6 +3,7 @@ package client;
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
+import chess.ChessPosition;
 import model.GameData;
 import ui.EscapeSequences;
 
@@ -10,24 +11,24 @@ import java.util.Scanner;
 
 public class Utils {
 
-    public static void printError(String error) {
+    static void printError(String error) {
         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Error: " + error + EscapeSequences.RESET_TEXT_COLOR);
     }
 
-    public static void displayNotification(String notification) {
+    static void displayNotification(String notification) {
         System.out.println(notification);
     }
 
-    public static void loadGame(GameData game) {
+    static void loadGame(GameData game) {
         printBoard(game.game().getBoard());
     }
 
-    public static void printBoard(ChessBoard board) {
+    static void printBoard(ChessBoard board) {
         printWhiteTop(board.getPieces());
         printBlackTop(board.getPieces());
     }
 
-    public static void printBlackTop(ChessPiece[][] pieces) {
+    static void printBlackTop(ChessPiece[][] pieces) {
         System.out.print("   ");
         for (int i = 0; i < 8; i++) {
             System.out.print(" " + Character.toString('ａ' + i) + " ");
@@ -49,7 +50,7 @@ public class Utils {
         System.out.println("   " + EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
     }
 
-    public static void printWhiteTop(ChessPiece[][] pieces) {
+    static void printWhiteTop(ChessPiece[][] pieces) {
         System.out.print("   ");
         for (int i = 0; i < 8; i++) {
             System.out.print(" " + Character.toString('ｈ' - i) + " ");
@@ -115,7 +116,7 @@ public class Utils {
         return pieceString;
     }
 
-    public static int getId(Scanner in, GameData[] games) {
+    static int getId(Scanner in, GameData[] games) {
         int id = 0;
         System.out.print("Game ID: ");
         while (id <= 0 || id > games.length) {
@@ -132,7 +133,7 @@ public class Utils {
         return id;
     }
 
-    public static String getInput(Scanner in, String prompt) {
+    static String getInput(Scanner in, String prompt) {
         String input;
         while (true) {
             System.out.print(prompt + ": ");
@@ -144,5 +145,108 @@ public class Utils {
                 return input;
             }
         }
+    }
+
+    static ChessPosition getSquare(Scanner in, String prompt) {
+        while (true) {
+            System.out.print(prompt + ": ");
+            String userInput = in.nextLine().strip().toLowerCase();
+            ChessPosition pos = parsePosition(userInput);
+            if (pos != null) {
+                return pos;
+            }
+        }
+    }
+
+    static ChessPosition parsePosition(String posString) {
+        if (posString.length() != 2) {
+            printError("Chess square must be exactly one letter followed by exactly one number.");
+            return null;
+        }
+        else if (posString.charAt(0) < 'a' || posString.charAt(0) > 'h') {
+            printError("First character must be a letter between a and h.");
+            return null;
+        }
+        else if (posString.charAt(1) < '1' || posString.charAt(1) > '8') {
+            printError("Second character must be a number between 1 and 8.");
+            return null;
+        }
+        else {
+            return ChessPosition.getPosition((posString.charAt(0) + 1) - 'a',
+                    Integer.parseInt(String.valueOf(posString.charAt(1))));
+        }
+    }
+
+    static ChessPiece.PieceType getPromotion(Scanner in, ChessPiece.PieceType type, int row, ChessGame.TeamColor color) {
+        if (type == ChessPiece.PieceType.PAWN &&
+                (color == ChessGame.TeamColor.WHITE && row == 8) ||
+                (color == ChessGame.TeamColor.BLACK && row == 1)) {
+
+            while (true) {
+                System.out.print("Piece to promote to: ");
+                ChessPiece.PieceType newType = switch (in.nextLine().toLowerCase().strip()) {
+                    case "pawn", "p" -> ChessPiece.PieceType.PAWN;
+                    case "knight", "n" -> ChessPiece.PieceType.KNIGHT;
+                    case "bishop", "b" -> ChessPiece.PieceType.BISHOP;
+                    case "rook", "r" -> ChessPiece.PieceType.ROOK;
+                    case "queen", "q" -> ChessPiece.PieceType.QUEEN;
+                    default -> {
+                        printError("Invalid promotion type.");
+                        yield null;
+                    }
+                };
+                if (newType != null) {
+                    return newType;
+                }
+            }
+        }
+        else {
+            return null;
+        }
+    }
+
+    static void helpBeforeLogin() {
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "login <USERNAME> <PASSWORD>"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - create an account");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - log into your account to play chess");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "quit"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - exit the chess client");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "help"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - print this help message");
+        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
+    }
+
+    static void helpAfterLogin() {
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "logout"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - log out of your account");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "create <NAME>"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - create a game");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "list"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - list all games");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "join <ID> [WHITE|BLACK]"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - join a game");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "observe <ID>"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - observe a game");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "help"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - print this help message");
+        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
+    }
+
+    static void helpInGame() {
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "redraw"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - redraw the board");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "leave"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - leave the match");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "move <from> <to>"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - make a move (<from> and <to> are squares notated as, e.g., \"a3\")");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "resign"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - concede the match");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "highlight" + EscapeSequences.RESET_TEXT_COLOR + "or"
+                + EscapeSequences.SET_TEXT_COLOR_BLUE + "moves"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - highlight legal moves in green");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "help"
+                + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - print this help message");
+        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
     }
 }
