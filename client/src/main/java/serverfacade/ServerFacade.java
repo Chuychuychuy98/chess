@@ -13,10 +13,7 @@ import request.LoginRequest;
 import request.RegisterRequest;
 import result.AuthTokenResult;
 import result.ListResult;
-import websocket.commands.ConnectCommand;
-import websocket.commands.LeaveCommand;
-import websocket.commands.MakeMoveCommand;
-import websocket.commands.UserGameCommand;
+import websocket.commands.*;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -98,6 +95,15 @@ public class ServerFacade extends Endpoint {
     public void move(String authToken, int id, ChessMove move) {
         try {
             send(new MakeMoveCommand(authToken, id, move));
+        }
+        catch (Exception e) {
+            observer.notify(new ErrorMessage(e.getMessage()));
+        }
+    }
+
+    public void resign(String authToken, int id) {
+        try {
+            send(new ResignCommand(authToken, id));
         }
         catch (Exception e) {
             observer.notify(new ErrorMessage(e.getMessage()));
@@ -207,4 +213,6 @@ public class ServerFacade extends Endpoint {
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
     }
+
+
 }

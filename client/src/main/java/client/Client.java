@@ -1,9 +1,6 @@
 package client;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import exceptions.ResponseException;
 import model.GameData;
 import serverfacade.ServerFacade;
@@ -215,6 +212,13 @@ public class Client {
                     else {
                         moveArgsProvided(args[1], args[2], in);
                     }
+                case "resign":
+                    System.out.println("Are you sure you want to resign? (Y/N): ");
+                    if ((userInput = in.nextLine().strip().toLowerCase()).equals("y") || userInput.equals("yes")) {
+                        resign();
+                        return;
+                    }
+                    break;
                 default:
                     System.out.println("Unrecognized command. For a list of available commands, type \"help\"");
             }
@@ -465,6 +469,16 @@ public class Client {
                 curGame.game().getBoard().getPiece(from).getPieceType(), to.getRow(), color);
 
         server.move(authToken, curGame.gameID(), new ChessMove(from, to, promotionPiece));
+    }
+
+    private void resign() {
+        try {
+            curGame.game().setGameOver();
+            server.resign(authToken, curGame.gameID());
+        }
+        catch (GameOverException e) {
+            printError("The game is already over.");
+        }
     }
 
     public void notify(ServerMessage msg) {

@@ -198,7 +198,10 @@ public class ChessGame {
         return over;
     }
 
-    public void setGameOver() {
+    public void setGameOver() throws GameOverException {
+        if (over) {
+            throw new GameOverException();
+        }
         over = true;
     }
 

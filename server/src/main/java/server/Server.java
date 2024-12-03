@@ -141,8 +141,7 @@ public class Server {
                 case CONNECT -> connect(session, username, gameID, ((ConnectCommand)cmd).getColor());
                 case MAKE_MOVE -> makeMove(session, username, gameID, ((MakeMoveCommand)cmd).getMove());
                 case LEAVE -> leave(session, username, gameID);
-//                case RESIGN -> resign(session, username, (ResignCommand)cmd);
-                default -> send(session, new ErrorMessage("Message type not yet implemented."));
+                case RESIGN -> resign(session, username, gameID);
             }
         }
         catch (UnauthorizedException e) {
@@ -174,6 +173,7 @@ public class Server {
     private void leave(Session session, String username, int gameID) throws IOException, DataAccessException {
         try {
             gameDAO.playerLeave(gameID, username);
+            connections.remove(username);
             connections.broadcast(gameID, new NotificationMessage(username + " has left the match."), username);
         }
         catch (EntryNotFoundException e) {
@@ -221,6 +221,25 @@ public class Server {
         } catch (InvalidMoveException e) {
             send(session, new ErrorMessage(e.getMessage() + "For a list of valid moves, try typing " +
                     "\u001b[38;512mmoves\u001b[38;5160m"));
+        }
+    }
+
+    private void resign(Session session, String username, int gameID) throws IOException, DataAccessException {
+        try {
+            GameData data = gameDAO.getGame(gameID);
+            if (!username.equals(data.whiteUsername()) && !username.equals(data.blackUsername())) {
+                send(session, new ErrorMessage("You are not currently playing this game. To join a game, type " +
+                    "\u001b[38;512mleave\u001b[38;5160m and join a new game"));
+                return;
+            }
+            gameDAO.setGameOver(gameID);
+            connections.broadcast(gameID, new NotificationMessage(username + " has resigned!\nGAME OVER!"));
+        }
+        catch (EntryNotFoundException e) {
+            send(session, new ErrorMessage("No game with ID " + gameID + " exists."));
+        }
+        catch (GameOverException e) {
+            send(session, new ErrorMessage(e.getMessage()));
         }
     }
 

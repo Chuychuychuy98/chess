@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.GameOverException;
 import chess.InvalidMoveException;
 import exceptions.DuplicateEntryException;
 import exceptions.EntryNotFoundException;
@@ -152,13 +153,13 @@ public class DatabaseGameDAO implements GameDAO {
             try (PreparedStatement ps = conn.prepareStatement(
                     "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?")) {
                 GameData data = getGame(gameID, ps);
-                if (data.whiteUsername().equals(username)) {
+                if (username.equals(data.whiteUsername())) {
                     try (PreparedStatement update = conn.prepareStatement("UPDATE game SET whiteUsername=NULL WHERE gameID=?")) {
                         update.setInt(1, gameID);
                         update.executeUpdate();
                     }
                 }
-                else if (data.blackUsername().equals(username)) {
+                else if (username.equals(data.blackUsername())) {
                     try (PreparedStatement update = conn.prepareStatement("UPDATE game SET blackUsername=NULL WHERE gameID=?")) {
                         update.setInt(1, gameID);
                         update.executeUpdate();
@@ -184,10 +185,30 @@ public class DatabaseGameDAO implements GameDAO {
                 }
 
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
 
+    }
+
+    @Override
+    public void setGameOver(int gameID) throws EntryNotFoundException, DataAccessException, GameOverException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?")) {
+                GameData data = getGame(gameID, ps);
+                data.game().setGameOver();
+                try (PreparedStatement update = conn.prepareStatement("UPDATE game SET game=? WHERE gameID=?")) {
+                    update.setString(1, data.serializedGame());
+                    update.setInt(2, gameID);
+                    update.executeUpdate();
+                }
+            }
+        }
+        catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     private GameData getGame(int gameID, PreparedStatement ps) throws SQLException, EntryNotFoundException {

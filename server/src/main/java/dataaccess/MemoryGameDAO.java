@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.GameOverException;
 import chess.InvalidMoveException;
 import exceptions.DuplicateEntryException;
 import exceptions.EntryNotFoundException;
@@ -32,10 +33,7 @@ public class MemoryGameDAO implements GameDAO{
 
     @Override
     public GameData getGame(int gameID) throws EntryNotFoundException {
-        GameData data = database.get(gameID);
-        if (data == null) {
-            throw new EntryNotFoundException(String.format("Game with ID %d not found.", gameID));
-        }
+        GameData data = getOrThrow(gameID);
         return data;
     }
 
@@ -46,28 +44,32 @@ public class MemoryGameDAO implements GameDAO{
 
     @Override
     public void updateGame(int gameID, ChessGame.TeamColor color, String newUsername) throws EntryNotFoundException {
-        GameData data = database.get(gameID);
-        if (data == null) {
-            throw new EntryNotFoundException(String.format("Game with id %d not found.", gameID));
-        }
+        GameData data = getOrThrow(gameID);
         database.put(data.gameID(), data.newPlayer(color, newUsername));
     }
 
     @Override
     public void playerLeave(int gameID, String username) throws EntryNotFoundException {
-        GameData data = database.get(gameID);
-        if (data == null) {
-            throw new EntryNotFoundException(String.format("Game with id %d not found.", gameID));
-        }
+        GameData data = getOrThrow(gameID);
         database.put(data.gameID(), data.removePlayer(username));
     }
 
     @Override
     public void makeMove(int gameID, String username, ChessMove move) throws EntryNotFoundException, InvalidMoveException {
+        GameData data = getOrThrow(gameID);
+        database.put(data.gameID(), data.makeMove(username, move));
+    }
+
+    @Override
+    public void setGameOver(int gameID) throws EntryNotFoundException, GameOverException {
+        getOrThrow(gameID).game().setGameOver();
+    }
+
+    private GameData getOrThrow(int gameID) throws EntryNotFoundException {
         GameData data = database.get(gameID);
         if (data == null) {
             throw new EntryNotFoundException(String.format("Game with id %d not found.", gameID));
         }
-        database.put(data.gameID(), data.makeMove(username, move));
+        return data;
     }
 }

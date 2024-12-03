@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.GameOverException;
 import chess.InvalidMoveException;
 import exceptions.DuplicateEntryException;
 import exceptions.EntryNotFoundException;
@@ -53,4 +54,6 @@ public interface GameDAO {
     void playerLeave(int gameID, String username) throws DataAccessException, EntryNotFoundException;
 
     void makeMove(int gameID, String username, ChessMove move) throws EntryNotFoundException, InvalidMoveException, DataAccessException;
+
+    void setGameOver(int gameID) throws EntryNotFoundException, DataAccessException, GameOverException;
 }
