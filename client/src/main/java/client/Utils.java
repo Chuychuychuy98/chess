@@ -197,8 +197,8 @@ public class Utils {
 
     static ChessPiece.PieceType getPromotion(Scanner in, ChessPiece.PieceType type, int row, ChessGame.TeamColor color) {
         if (type == ChessPiece.PieceType.PAWN &&
-                (color == ChessGame.TeamColor.WHITE && row == 8) ||
-                (color == ChessGame.TeamColor.BLACK && row == 1)) {
+                ((color == ChessGame.TeamColor.WHITE && row == 8) ||
+                (color == ChessGame.TeamColor.BLACK && row == 1))) {
 
             while (true) {
                 System.out.print("Piece to promote to: ");
