@@ -177,18 +177,8 @@ public class Client {
 
     private void inGame(Scanner in) {
         while (true) {
-            if (print) {
-                if (color == ChessGame.TeamColor.WHITE) {
-                    printBlackTop(curGame.game().getBoard().getPieces());
-                } else {
-                    printWhiteTop(curGame.game().getBoard().getPieces());
-                }
-            }
-            if (color == curGame.game().getTeamTurn()) {
-                System.out.println("It's your turn!");
-            }
-            else {
-                System.out.println("It's " + curGame.game().getTeamTurn() + "'s turn.");
+            if (curGame.game().isOver()) {
+                System.out.println("Game Over!");
             }
             System.out.printf("[%s] >>> ", username);
             String userInput = in.nextLine();
@@ -234,15 +224,18 @@ public class Client {
                     break;
                 case "highlight":
                 case "moves":
-                    if (args.length > 2) {
-                        printError("Too many arguments given. " + EscapeSequences.SET_TEXT_COLOR_BLUE + args[0] +
-                                EscapeSequences.SET_TEXT_COLOR_RED + " takes a position to highlight moves for.");
-                    }
-                    else if (args.length == 2) {
-                        highlightArgsProvided(args[1]);
+                    if (curGame.game().getTeamTurn() != color) {
+                        printError("It is not your turn.");
                     }
                     else {
-                        highlightGetArgs(in);
+                        if (args.length > 2) {
+                            printError("Too many arguments given. " + EscapeSequences.SET_TEXT_COLOR_BLUE + args[0] +
+                                    EscapeSequences.SET_TEXT_COLOR_RED + " takes a position to highlight moves for.");
+                        } else if (args.length == 2) {
+                            highlightArgsProvided(args[1]);
+                        } else {
+                            highlightGetArgs(in);
+                        }
                     }
                     print = false;
                     break;
@@ -512,11 +505,24 @@ public class Client {
 
     public void notify(ServerMessage msg) {
         switch (msg.getServerMessageType()) {
-            case NOTIFICATION -> displayNotification(((NotificationMessage) msg).getMessage());
+            case NOTIFICATION -> displayNotification(((NotificationMessage) msg).getMessage(), username);
             case ERROR -> printError(((ErrorMessage) msg).getMessage());
             case LOAD_GAME -> {
                 curGame = ((LoadGameMessage) msg).getGame();
-                printBoard(curGame.game().getBoard());
+                System.out.println();
+                if (color == ChessGame.TeamColor.BLACK) {
+                    Utils.printWhiteTop(curGame.game().getBoard().getPieces());
+                }
+                else {
+                    Utils.printBlackTop(curGame.game().getBoard().getPieces());
+                }
+                if (color == curGame.game().getTeamTurn()) {
+                    System.out.println("It's your turn!");
+                }
+                else {
+                    System.out.println("It's " + curGame.game().getTeamTurn() + "'s turn.");
+                }
+                System.out.print("[" + username + "] >>> ");
             }
         }
     }
