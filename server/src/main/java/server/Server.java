@@ -148,7 +148,6 @@ public class Server {
             send(session, new ErrorMessage("unauthorized"));
         }
         catch (Exception e) {
-            e.printStackTrace();
             send(session, new ErrorMessage(e.getMessage()));
         }
     }
