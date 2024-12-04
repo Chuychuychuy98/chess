@@ -45,7 +45,7 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
         }
     }
 
-    public GameData makeMove(String username, ChessMove move) throws NonexistentPlayerException, WrongTurnException, InvalidMoveException {
+    public GameData makeMove(String username, ChessMove move) throws InvalidMoveException {
         if (username.equals(blackUsername)) {
             if (!game.getTeamTurn().equals(ChessGame.TeamColor.BLACK)) {
                 throw new WrongTurnException(username);
