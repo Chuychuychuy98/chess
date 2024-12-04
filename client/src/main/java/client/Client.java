@@ -237,7 +237,6 @@ public class Client {
                             highlightGetArgs(in);
                         }
                     }
-                    print = false;
                     break;
                 default:
                     System.out.println("Unrecognized command. For a list of available commands, type \"help\"");
@@ -478,8 +477,13 @@ public class Client {
                     " and a number for the row, as in \"a1\".");
             return;
         }
+        ChessPiece fromPiece = curGame.game().getBoard().getPiece(from);
+        if (fromPiece == null) {
+            printError("No piece at that position.");
+            return;
+        }
         ChessPiece.PieceType promotionPiece = Utils.getPromotion(in,
-                curGame.game().getBoard().getPiece(from).getPieceType(), to.getRow(), color);
+                fromPiece.getPieceType(), to.getRow(), color);
 
         server.move(authToken, curGame.gameID(), new ChessMove(from, to, promotionPiece));
     }
