@@ -201,10 +201,10 @@ public class Server {
             connections.broadcast(gameID, new NotificationMessage(username + " moved " +
                     move.getStartPosition().chessNotation() + " to " +
                     move.getEndPosition().chessNotation() + "."), username);
-            if (game.game().isInCheck(color.opposite())) {
-                connections.broadcast(gameID, new NotificationMessage(opponentName + " is now in check!"));
+            if (game.game().isInCheckmate(color.opposite())) {
+                connections.broadcast(gameID, new NotificationMessage(opponentName + " is now in checkmate!\nGAME OVER!"));
             }
-            else if (game.game().isInCheckmate(color.opposite())) {
+            else if (game.game().isInCheck(color.opposite())) {
                 connections.broadcast(gameID, new NotificationMessage(opponentName + " is now in checkmate!\nGAME OVER!"));
             }
             else if (game.game().isInStalemate(color.opposite())) {
