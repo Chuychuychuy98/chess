@@ -2,6 +2,7 @@ package client;
 
 import chess.*;
 import model.GameData;
+import serverfacade.ServerFacade;
 import ui.EscapeSequences;
 
 import java.util.Collection;
@@ -296,5 +297,46 @@ public class Utils {
         else {
             printBlackTop(data.game().getBoard().getPieces(), data.game().validEndPositions(position));
         }
+    }
+
+    static void move(String fromString, String toString, Scanner in, String authToken,
+                              GameData curGame, ChessGame.TeamColor color, ServerFacade server) {
+        ChessPosition from = Utils.parsePosition(fromString);
+        if (from == null) {
+            printError("<From> string formatted incorrectly. A chess square is notated with a letter for the column" +
+                    " and a number for the row, as in \"a1\".");
+            return;
+        }
+        ChessPosition to = Utils.parsePosition(toString);
+        if (to == null) {
+            printError("<To> string formatted incorrectly. A chess square is notated with a letter for the column" +
+                    " and a number for the row, as in \"a1\".");
+            return;
+        }
+        ChessPiece fromPiece = curGame.game().getBoard().getPiece(from);
+        if (fromPiece == null) {
+            printError("No piece at that position.");
+            return;
+        }
+        ChessPiece.PieceType promotionPiece = getPromotion(in,
+                fromPiece.getPieceType(), to.getRow(), color);
+        server.move(authToken, curGame.gameID(), new ChessMove(from, to, promotionPiece));
+    }
+
+    static int joinObserveCommon(String idString, GameData[] games) {
+        if (games == null) {
+            System.out.println("You must first list the games with "+ EscapeSequences.SET_TEXT_COLOR_BLUE
+                    + "list" + EscapeSequences.RESET_TEXT_COLOR);
+            return -1;
+        }
+        int id;
+        try {
+            id = Integer.parseInt(idString);
+        }
+        catch (NumberFormatException e) {
+            printError("Please proved a numerical ID.");
+            return -1;
+        }
+        return id;
     }
 }
