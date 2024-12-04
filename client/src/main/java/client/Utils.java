@@ -330,4 +330,23 @@ public class Utils {
         }
         return id;
     }
+
+    static void printBoard(GameData game, ChessGame.TeamColor color) {
+        if (color == ChessGame.TeamColor.BLACK) {
+            Utils.printWhiteTop(game.game().getBoard().getPieces());
+        }
+        else {
+            Utils.printBlackTop(game.game().getBoard().getPieces());
+        }
+        if (game.game().isOver()) {
+            System.out.println("Game over!");
+        }
+        else {
+            if (color == game.game().getTeamTurn()) {
+                System.out.println("It's your turn!");
+            } else {
+                System.out.println("It's " + game.game().getTeamTurn() + "'s turn.");
+            }
+        }
+    }
 }

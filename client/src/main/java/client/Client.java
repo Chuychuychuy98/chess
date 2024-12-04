@@ -480,22 +480,7 @@ public class Client {
             case LOAD_GAME -> {
                 curGame = ((LoadGameMessage) msg).getGame();
                 System.out.println();
-                if (color == ChessGame.TeamColor.BLACK) {
-                    Utils.printWhiteTop(curGame.game().getBoard().getPieces());
-                }
-                else {
-                    Utils.printBlackTop(curGame.game().getBoard().getPieces());
-                }
-                if (curGame.game().isOver()) {
-                    System.out.println("Game over!");
-                }
-                else {
-                    if (color == curGame.game().getTeamTurn()) {
-                        System.out.println("It's your turn!");
-                    } else {
-                        System.out.println("It's " + curGame.game().getTeamTurn() + "'s turn.");
-                    }
-                }
+                Utils.printBoard(curGame, color);
                 System.out.print("[" + username + "] >>> ");
             }
         }
