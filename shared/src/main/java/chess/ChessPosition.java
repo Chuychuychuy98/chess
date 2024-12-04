@@ -130,6 +130,6 @@ public class ChessPosition {
     }
 
     public String chessNotation() {
-        return String.valueOf((row - 1) + 'a') + (col - 1);
+        return String.format("%c%d", ((col-1) + 'a'), (row));
     }
 }
