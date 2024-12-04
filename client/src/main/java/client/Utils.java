@@ -285,6 +285,10 @@ public class Utils {
             printError("There is no piece at position " + position.chessNotation());
             return;
         }
+        if (data.game().getBoard().getPiece(position).getTeamColor() != color) {
+            printError("That is not your piece.");
+            return;
+        }
 
         if (color == ChessGame.TeamColor.BLACK) {
             printWhiteTop(data.game().getBoard().getPieces(), data.game().validEndPositions(position));
