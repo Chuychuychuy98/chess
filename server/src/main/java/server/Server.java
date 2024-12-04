@@ -202,13 +202,13 @@ public class Server {
                     move.getStartPosition().chessNotation() + " to " +
                     move.getEndPosition().chessNotation() + "."), username);
             if (game.game().isInCheckmate(color.opposite())) {
-                connections.broadcast(gameID, new NotificationMessage(opponentName + " is now in checkmate!\nGAME OVER!"));
+                connections.broadcast(gameID, new NotificationMessage(opponentName + " is now in checkmate!"));
             }
             else if (game.game().isInCheck(color.opposite())) {
-                connections.broadcast(gameID, new NotificationMessage(opponentName + " is now in checkmate!\nGAME OVER!"));
+                connections.broadcast(gameID, new NotificationMessage(opponentName + " is now in check!"));
             }
             else if (game.game().isInStalemate(color.opposite())) {
-                connections.broadcast(gameID, new NotificationMessage("Stalemate!\nGAME OVER!"));
+                connections.broadcast(gameID, new NotificationMessage("Stalemate!"));
             }
         } catch (EntryNotFoundException e) {
             send(session, new ErrorMessage("No game with ID " + gameID + " exists."));

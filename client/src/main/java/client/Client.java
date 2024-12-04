@@ -473,7 +473,10 @@ public class Client {
     public void notify(ServerMessage msg) {
         switch (msg.getServerMessageType()) {
             case NOTIFICATION -> displayNotification(((NotificationMessage) msg).getMessage(), username);
-            case ERROR -> printError(((ErrorMessage) msg).getMessage());
+            case ERROR ->  {
+                printError(((ErrorMessage) msg).getMessage());
+                System.out.println("[" + username + "] >>> ");
+            }
             case LOAD_GAME -> {
                 curGame = ((LoadGameMessage) msg).getGame();
                 System.out.println();
@@ -483,11 +486,15 @@ public class Client {
                 else {
                     Utils.printBlackTop(curGame.game().getBoard().getPieces());
                 }
-                if (color == curGame.game().getTeamTurn()) {
-                    System.out.println("It's your turn!");
+                if (curGame.game().isOver()) {
+                    System.out.println("Game over!");
                 }
                 else {
-                    System.out.println("It's " + curGame.game().getTeamTurn() + "'s turn.");
+                    if (color == curGame.game().getTeamTurn()) {
+                        System.out.println("It's your turn!");
+                    } else {
+                        System.out.println("It's " + curGame.game().getTeamTurn() + "'s turn.");
+                    }
                 }
                 System.out.print("[" + username + "] >>> ");
             }
