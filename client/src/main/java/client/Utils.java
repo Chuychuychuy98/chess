@@ -20,15 +20,6 @@ public class Utils {
         System.out.print("[" + username + "] >>> ");
     }
 
-    static void loadGame(GameData game) {
-        printBoard(game.game().getBoard());
-    }
-
-    static void printBoard(ChessBoard board) {
-        printWhiteTop(board.getPieces());
-        printBlackTop(board.getPieces());
-    }
-
     static void printBlackTop(ChessPiece[][] pieces) {
         printBlackTop(pieces, Collections.emptyList());
     }
