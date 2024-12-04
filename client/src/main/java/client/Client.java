@@ -176,7 +176,6 @@ public class Client {
     }
 
     private void inGame(Scanner in) {
-        boolean print = true;
         while (true) {
             if (print) {
                 if (color == ChessGame.TeamColor.WHITE) {
@@ -197,7 +196,6 @@ public class Client {
             switch (args[0].toLowerCase()) {
                 case "help":
                     Utils.helpInGame();
-                    print = true;
                     break;
                 case "redraw":
                     System.out.print(EscapeSequences.ERASE_SCREEN);
@@ -207,7 +205,6 @@ public class Client {
                     else {
                         Utils.printBlackTop(curGame.game().getBoard().getPieces());
                     }
-                    print = false;
                     break;
                 case "leave":
                     if (server.leave(authToken, curGame.gameID())) {
@@ -228,14 +225,12 @@ public class Client {
                     else {
                         moveArgsProvided(args[1], args[2], in);
                     }
-                    print = true;
                     break;
                 case "resign":
                     System.out.println("Are you sure you want to resign? (Y/N): ");
                     if ((userInput = in.nextLine().strip().toLowerCase()).equals("y") || userInput.equals("yes")) {
                         resign();
                     }
-                    print = true;
                     break;
                 case "highlight":
                 case "moves":

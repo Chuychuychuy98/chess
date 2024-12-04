@@ -14,8 +14,9 @@ public class Utils {
         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Error: " + error + EscapeSequences.RESET_TEXT_COLOR);
     }
 
-    static void displayNotification(String notification) {
+    static void displayNotification(String notification, String username) {
         System.out.println(notification);
+        System.out.print("[" + username + "] >>> ");
     }
 
     static void loadGame(GameData game) {
