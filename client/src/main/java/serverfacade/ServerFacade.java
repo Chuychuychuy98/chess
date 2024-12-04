@@ -38,7 +38,7 @@ public class ServerFacade extends Endpoint {
                 (JsonDeserializer<ServerMessage>) (el, type, ctx) -> {
                     ServerMessage msg = null;
                     if (el.isJsonObject()) {
-                        String msgType = el.getAsJsonObject().get("type").getAsString();
+                        String msgType = el.getAsJsonObject().get("serverMessageType").getAsString();
                         msg = switch (ServerMessage.ServerMessageType.valueOf(msgType)) {
                             case NOTIFICATION -> ctx.deserialize(el, NotificationMessage.class);
                             case ERROR -> ctx.deserialize(el, ErrorMessage.class);
@@ -71,11 +71,14 @@ public class ServerFacade extends Endpoint {
     }
 
     public void observe(String authToken, int id) {
+        observe(authToken, id, null);
+    }
+    public void observe(String authToken, int id, ChessGame.TeamColor color) {
         try {
             if (session == null) {
                 webSocketConnect();
             }
-            send(new ConnectCommand(authToken, id));
+            send(new ConnectCommand(authToken, id, color));
         } catch (Exception e) {
             observer.notify(new ErrorMessage(e.getMessage()));
         }
@@ -143,7 +146,7 @@ public class ServerFacade extends Endpoint {
 
     public void join(int gameID, ChessGame.TeamColor team, String authToken) throws ResponseException {
         this.makeRequest("PUT", "/game", new JoinRequest(team, gameID), authToken, null);
-        this.observe(authToken, gameID);
+        this.observe(authToken, gameID, team);
     }
 
     private <T> T makeRequest(String method, String path, Object request, String authToken, Class<T> responseClass) throws ResponseException {

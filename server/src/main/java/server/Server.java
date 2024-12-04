@@ -156,7 +156,7 @@ public class Server {
     private void connect(Session session, String username, int gameID, ChessGame.TeamColor color)
             throws IOException, DataAccessException {
         try {
-            send(session, new LoadGameMessage(gameDAO.getGame(gameID).serializedGame()));
+            send(session, new LoadGameMessage(new Gson().toJson(gameDAO.getGame(gameID))));
             if (color == null) {
                 connections.broadcast(gameID, new NotificationMessage(username + " is now observing!"), username);
 
@@ -199,7 +199,8 @@ public class Server {
 
             connections.broadcast(gameID, new LoadGameMessage(new Gson().toJson(game)));
             connections.broadcast(gameID, new NotificationMessage(username + " moved " +
-                    move.getStartPosition() + " to " + move.getEndPosition() + "."), username);
+                    move.getStartPosition().chessNotation() + " to " +
+                    move.getEndPosition().chessNotation() + "."), username);
             if (game.game().isInCheck(color.opposite())) {
                 connections.broadcast(gameID, new NotificationMessage(opponentName + " is now in check!"));
             }

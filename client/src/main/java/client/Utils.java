@@ -1,12 +1,11 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import model.GameData;
 import ui.EscapeSequences;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Scanner;
 
 public class Utils {
@@ -29,6 +28,10 @@ public class Utils {
     }
 
     static void printBlackTop(ChessPiece[][] pieces) {
+        printBlackTop(pieces, Collections.emptyList());
+    }
+
+    static void printBlackTop(ChessPiece[][] pieces, Collection<ChessPosition> highlight) {
         System.out.print("   ");
         for (int i = 0; i < 8; i++) {
             System.out.print(" " + Character.toString('ａ' + i) + " ");
@@ -37,7 +40,7 @@ public class Utils {
         for (int i = 7; i >= 0; i--) {
             System.out.print(" " + (i+1) + " ");
             for (int j = 0; j < 8; j++) {
-                printCell(pieces, i, j);
+                printCell(pieces, i, j, highlight.contains(ChessPosition.getPosition(i+1, j+1)));
             }
             System.out.print(EscapeSequences.RESET_BG_COLOR);
             System.out.print(" " + (i+1) + " ");
@@ -51,6 +54,10 @@ public class Utils {
     }
 
     static void printWhiteTop(ChessPiece[][] pieces) {
+        printWhiteTop(pieces, Collections.emptyList());
+    }
+
+    static void printWhiteTop(ChessPiece[][] pieces, Collection<ChessPosition> highlight) {
         System.out.print("   ");
         for (int i = 0; i < 8; i++) {
             System.out.print(" " + Character.toString('ｈ' - i) + " ");
@@ -59,7 +66,7 @@ public class Utils {
         for (int i = 0; i < 8; i++) {
             System.out.print(" " + (i+1) + " ");
             for (int j = 7; j >= 0; j--) {
-                printCell(pieces, i, j);
+                printCell(pieces, i, j, highlight.contains(ChessPosition.getPosition(i+1, j+1)));
             }
             System.out.print(EscapeSequences.RESET_BG_COLOR);
             System.out.print(" " + (i+1) + " ");
@@ -72,12 +79,22 @@ public class Utils {
         System.out.println("   " + EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_BG_COLOR);
     }
 
-    private static void printCell(ChessPiece[][] pieces, int i, int j) {
-        if (j % 2 != i % 2) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+    private static void printCell(ChessPiece[][] pieces, int i, int j, boolean highlight) {
+        String blackColor;
+        String whiteColor;
+        if (highlight) {
+            blackColor = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+            whiteColor = EscapeSequences.SET_BG_COLOR_GREEN;
         }
         else {
-            System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
+            blackColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+            whiteColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+        }
+        if (j % 2 != i % 2) {
+            System.out.print(whiteColor);
+        }
+        else {
+            System.out.print(blackColor);
         }
         ChessPiece piece = pieces[i][j];
         if (piece == null) {
@@ -172,8 +189,8 @@ public class Utils {
             return null;
         }
         else {
-            return ChessPosition.getPosition((posString.charAt(0) + 1) - 'a',
-                    Integer.parseInt(String.valueOf(posString.charAt(1))));
+            return ChessPosition.getPosition(Integer.parseInt(String.valueOf(posString.charAt(1))),
+            (posString.charAt(0) + 1) - 'a');
         }
     }
 
@@ -242,11 +259,37 @@ public class Utils {
                 + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - make a move (<from> and <to> are squares notated as, e.g., \"a3\")");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "resign"
                 + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - concede the match");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "highlight" + EscapeSequences.RESET_TEXT_COLOR + "or"
-                + EscapeSequences.SET_TEXT_COLOR_BLUE + "moves"
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "highlight " + EscapeSequences.RESET_TEXT_COLOR + "or"
+                + EscapeSequences.SET_TEXT_COLOR_BLUE + " moves"
                 + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - highlight legal moves in green");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "help"
                 + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - print this help message");
         System.out.print(EscapeSequences.RESET_TEXT_COLOR);
+    }
+
+    static void highlightMoves(ChessGame.TeamColor color, GameData data, ChessPosition position) {
+        if (color == null) {
+            printError("You are not currently playing the game.");
+            return;
+        }
+        if (data == null) {
+            printError("You must join a game before you can highlight legal moves.");
+            return;
+        }
+        if (position == null) {
+            printError("Invalid position.");
+            return;
+        }
+        if (data.game().getBoard().getPiece(position) == null) {
+            printError("There is no piece at position " + position.chessNotation());
+            return;
+        }
+
+        if (color == ChessGame.TeamColor.BLACK) {
+            printWhiteTop(data.game().getBoard().getPieces(), data.game().validEndPositions(position));
+        }
+        else {
+            printBlackTop(data.game().getBoard().getPieces(), data.game().validEndPositions(position));
+        }
     }
 }

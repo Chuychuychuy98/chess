@@ -176,13 +176,28 @@ public class Client {
     }
 
     private void inGame(Scanner in) {
+        boolean print = true;
         while (true) {
+            if (print) {
+                if (color == ChessGame.TeamColor.WHITE) {
+                    printBlackTop(curGame.game().getBoard().getPieces());
+                } else {
+                    printWhiteTop(curGame.game().getBoard().getPieces());
+                }
+            }
+            if (color == curGame.game().getTeamTurn()) {
+                System.out.println("It's your turn!");
+            }
+            else {
+                System.out.println("It's " + curGame.game().getTeamTurn() + "'s turn.");
+            }
             System.out.printf("[%s] >>> ", username);
             String userInput = in.nextLine();
             String[] args = userInput.split(" +");
             switch (args[0].toLowerCase()) {
                 case "help":
                     Utils.helpInGame();
+                    print = true;
                     break;
                 case "redraw":
                     System.out.print(EscapeSequences.ERASE_SCREEN);
@@ -192,6 +207,7 @@ public class Client {
                     else {
                         Utils.printBlackTop(curGame.game().getBoard().getPieces());
                     }
+                    print = false;
                     break;
                 case "leave":
                     if (server.leave(authToken, curGame.gameID())) {
@@ -212,20 +228,34 @@ public class Client {
                     else {
                         moveArgsProvided(args[1], args[2], in);
                     }
+                    print = true;
+                    break;
                 case "resign":
                     System.out.println("Are you sure you want to resign? (Y/N): ");
                     if ((userInput = in.nextLine().strip().toLowerCase()).equals("y") || userInput.equals("yes")) {
                         resign();
-                        return;
                     }
+                    print = true;
+                    break;
+                case "highlight":
+                case "moves":
+                    if (args.length > 2) {
+                        printError("Too many arguments given. " + EscapeSequences.SET_TEXT_COLOR_BLUE + args[0] +
+                                EscapeSequences.SET_TEXT_COLOR_RED + " takes a position to highlight moves for.");
+                    }
+                    else if (args.length == 2) {
+                        highlightArgsProvided(args[1]);
+                    }
+                    else {
+                        highlightGetArgs(in);
+                    }
+                    print = false;
                     break;
                 default:
                     System.out.println("Unrecognized command. For a list of available commands, type \"help\"");
             }
         }
     }
-
-
 
     private boolean loginGetArgs(Scanner in) {
         String username = getInput(in, "Username");
@@ -362,9 +392,8 @@ public class Client {
         try {
             curGame = games[id-1];
             server.join(curGame.gameID(), teamString.equals("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, authToken);
-            color = ChessGame.TeamColor.valueOf(teamString);
+            color = ChessGame.TeamColor.valueOf(teamString.toUpperCase());
             return true;
-//            printBoard(games[id-1].game().getBoard());
         }
         catch (ResponseException e) {
             printError(e.getMessage());
@@ -406,7 +435,6 @@ public class Client {
             server.join(curGame.gameID(), team, authToken);
             color = team;
             return true;
-            //printBoard(games[id-1].game().getBoard());
         }
         catch (ResponseException e) {
             printError(e.getMessage());
@@ -426,8 +454,6 @@ public class Client {
         curGame = games[id-1];
         server.observe(authToken, curGame.gameID());
         return true;
-        //printBlackTop(server.observe(games[id-1].gameID()).game().getBoard().getPieces());
-        //printBoard(games[id-1].game().getBoard());
     }
 
     private boolean observeGetArgs(Scanner in) {
@@ -440,7 +466,6 @@ public class Client {
         curGame = games[id-1];
         server.observe(authToken, curGame.gameID());
         return true;
-        //printBoard(games[id-1].game().getBoard());
     }
 
     private void moveGetArgs(Scanner in) {
@@ -481,13 +506,22 @@ public class Client {
         }
     }
 
+    private void highlightGetArgs(Scanner in) {
+        ChessPosition pos = Utils.getSquare(in, "Piece");
+        Utils.highlightMoves(color, curGame, pos);
+    }
+
+    private void highlightArgsProvided(String position) {
+        Utils.highlightMoves(color, curGame, parsePosition(position));
+    }
+
     public void notify(ServerMessage msg) {
         switch (msg.getServerMessageType()) {
             case NOTIFICATION -> displayNotification(((NotificationMessage) msg).getMessage());
             case ERROR -> printError(((ErrorMessage) msg).getMessage());
             case LOAD_GAME -> {
-                //this.currentGame = ((LoadGameMessage) msg).getGame();
-                loadGame(((LoadGameMessage) msg).getGame());
+                curGame = ((LoadGameMessage) msg).getGame();
+                printBoard(curGame.game().getBoard());
             }
         }
     }

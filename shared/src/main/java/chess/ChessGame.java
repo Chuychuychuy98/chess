@@ -49,6 +49,10 @@ public class ChessGame {
         this.turn = team;
     }
 
+    public Collection<ChessPosition> validEndPositions(ChessPosition startPosition) {
+        return validMoves(startPosition).stream().map(ChessMove::getEndPosition).toList();
+    }
+
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
